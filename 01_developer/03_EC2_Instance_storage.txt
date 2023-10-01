@@ -1,0 +1,79 @@
+EBS - Elastic Block Store - network drive that you can attache to EC2 Instance
+may be attached only to 1 EC2 at same time (like usb stick)
+same AZ as EC2
+for migrate data to another AZ :
+  create snapshot of EBS Volume
+  copy snapshot to any AZ
+  restore in new EBS Volume in another AZ from copyed snapshot
+  
+==============================================================
+EBS Snapshot
+  Snapshot may be archived - up to 75% cheaper;  restore takes 24 - 72 hours 
+  may be restored after deleteon (deleteon moves  snapshot to recycle bin from 1 day to 1 year)
+  ARchive Snapshot : click on snapshot -> Actions -> Archive Snapshot
+  
+  Fast Snapshot Restore - no latency on the first use ($$$)
+  
+  Recycle Bin : 
+    RC2 -> Elastic Block Store -> Snapshots -> Recycle Bin
+	  Create retention Rule ->
+	  
+=============================================================
+AMI - Amazone MAchine Image  - config of custom EC2 with software, OS, monitoring ...
+  region Specified but may be copyed to another Region
+    may be selled on marketplace
+	
+	Create AMI :
+	  select Instance -> Actions -> Images And Templates -> create Image ->
+	Run Image:
+	    EC2 -> Images -> AMIs -> select AMi -> Launch instance from AMI
+		OR
+		EC2 -> instances -> Launch an Instance -> My AMIs
+	
+==============================================================
+EC2 Instance Store : 
+  high performance hardware disk that may be attached 
+    EC2 loses storage on stop - so it good for  buffer, cache, scratch data, temp contend  - for high performance
+	
+==============================================================
+EBS Volumes Types : 
+  gp2/gp3 (SSD) General purpose
+  io1/io2 (SSD) Highest-performance
+  st1 (HDD) Low cost HDD
+  sc1 (HDD) - low cost HDD
+  
+  EBS Volumes are characterized in Size|Throughtput| IOPS (I/O Ops Per Sec)
+  
+  only gp2/gp3 and io1/io2 can be used as boot volume
+  
+ =======================================================================
+ EBS Multi-Attach io1/io2 family
+ in same AZ
+ up to 16 instances in one time
+ 
+ ==========================================================================
+ EFS - elastic file system (like NFS)
+ many EC2 
+ in multi AZ
+ Highly available, scalable, expensive, pay per use
+ 
+ EFS - Storage Classes
+   Storage Tiers (lifecycle management feature - move file after N days) old fies 
+   will be moved from 
+   "EFS Standard" - multi AZ 
+   to 
+   "EFS IA" storage  - one AZ  - 90% cost saving
+   
+ ==========================================================================
+ 
+ Create EFS : 
+  EFS -> Create EFS
+  create instances -> set EFS during configuring
+    
+ 
+ 
+ 
+ 
+ 
+ 
+  

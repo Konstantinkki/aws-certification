@@ -1,0 +1,53 @@
+set password policy:
+IAM -> Access Management -> Account settings -> edit
+
+set MFA (root user access):
+Account Name (right top) -> Security credentials  
+
+CLI assess
+ install CLI;
+ generate key :
+	IAM -> users -> userName -> Security credentionals -> Create Access Key -> CLI 
+ open locale console:
+   configure cmd : 
+     aws configure - enter key ans secret
+   command: 
+     aws iam list-users  - list of users
+
+=============================================================
+CLoud Shell: 
+  click icon on topof web console
+    may don't work for some regions
+=============================================================
+IAM role may be assigned to aws service 
+ en example: 
+   to EC2, Lambda, CloudFormation
+=============================================================
+IAM security tools: 
+  IAM Credentials Report (account level) : list accounts, users, status of credentionals
+    IAM -> Access Reports -> Credential Report -> Generate report
+
+  IAM Access Advisor (User Level) : services permissions granted to a user and when services was accessed
+    IAM -> users -> <select User> -> Access Advisor
+============================================================
+Shared responsibility model for IAM:
+AWS                                                    User
+(all infrastructure)                           (how to use infrastructure)
+infrastructure(global network security)        Users, Groups, Roles, Policies management and monitoring
+Configuration and vulnerability analysis       Enable MFA on all account
+Compliance validation                          Rotate all your keys often
+                                               Use IAM tools to apply appropriate permissions
+                                               Abalyze access patterns & review permissions
+
+===========================================================
+IAM section Summary :
+1 Users : mapped ,to a physical user, has a password for AWS Console
+2 Groups : contains users only
+3 Polices: JSON document that outlines permissions for users or groups
+4 ROles : for EC2 instances or AWS Services
+5 Security : MFA + Password policy  tool : IAM Credentional Report
+6 AWS CLi : manage your AWS services using the command-line
+7 AWS SDK : manage your AWS services using a programming language
+8 Access Keys : access AWS using the CLI or SDK
+9 Audit : IAM Credentional Report & IAM Access Advisor
+

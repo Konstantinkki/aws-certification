@@ -1,0 +1,51 @@
+Budget :
+  allow IAM users access to billing info:
+    <user name in root account> -> account -> 'IAM user and role access to Billing information' -> edit -> Activate IAM Access
+
+  Billing Dashboard : 
+    click <user name> in admin account -> biling dashboard
+
+  show spend money :
+    Billing Dashboard -> Bills (at left pannel) 
+ 
+  used free resources :
+    Billing Dashboard -> Free tier
+
+  Budgets : 
+    Billing Dashboard -> Cost Management -> Budgets
+
+=====================================================
+
+EC2 basics - Infrastructure as a service
+  EC2 User Data (bootstrap) script - runs ones at instance first start
+    runs with root user for install updates, software, download files from internet ... 
+	
+====================================================-
+Instance Types : 
+  General Purpose  - t
+  Compute Optimized - C
+  Memory Optimized  - R
+  Accelerated Computing
+  Storage Optimized  - i
+  Instance Features
+  Measuring Instance Performance (Оптимизтолванно для измерений)
+  
+====================================================
+Security Groups controls traffic in/out and by other security groups
+  by default : 
+    inbound traffic is blocked
+	outbound traffic is allowed
+
+====================================================
+	
+Connect with ssh :
+ geneRATE .pem file
+ goto folder with .pem file
+ gun command :  ssh -i .\ec2Tutorial.pem ec2-user@3.131.142.143 
+ 
+ with putty:
+   download .ppk file
+   regenerate with puttyGen pem file
+   open Putty
+     server : ec3-user@<server-ip>
+	 set key file

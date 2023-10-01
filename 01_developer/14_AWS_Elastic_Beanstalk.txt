@@ -1,0 +1,252 @@
+Typical architecture: Web App 3-tier
+
+user -> route53
+user -> ELB (multi AZ) -> ASG (instances AZ1, AZ2, AZ3) ->  ElastiCache (store/retrive session data + Cached data)
+							    Amazon RDS (read write) 
+--------------------------------------------------------------------------------------------------------------------
+Developer problems on AWS
+	Managing infrastructure
+	Deploy code 
+	Configuring all databases, load balancers, etc
+	Scaling concerns
+
+	Most web apps have the same architecture (ALB + ASG)
+	All the developers want is for their code to run!
+	Possibly, consistently across different applications and environment
+--------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk Overview
+	Elastic Beanstalk is a developer centric view of deploying an application on AWS
+	It uses the component's we've seen before : EC2, ASG, ELB, RDS, ...
+	Managed service
+		Automatically handles capacity provisioning, load balancing, scaling, application health monitoring, instance configuration, ...
+		Just the application code is the responsibility of the developer
+	We still have full control over the configuration
+	Beanstalk is free but you pay for the underlying instances
+-----------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk - Components
+	Application : collection of Elastic Beanstalk components (environments, versions, configurations, ...)
+	Application Version : an iteration of your application code
+	Environment 
+		Collection of AWS resources running an application version (only one application version at a time)
+		Tiers: Web Server Environment Tier & Worker Environment Tier
+		You can create multiple environments (dev, test, prod ...)
+
+Create Application -> Uploading Version -> Launch Environment -> Manage Environment [ -> Update Version -> deploy new version] 
+-----------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk  - Supported Platforms
+Go
+Java SE
+Java with Tomcat
+.NET Core on Linux
+.NET on Windows Server
+Node.js
+PHP
+Python
+Ruby
+Packer Builder
+Single Container Docker
+Multi-container Docker
+Preconfigured Docker
+if not supported, you can write your custom platform (advanced)
+------------------------------------------------------------------------------------------------------------------------
+Web Server Tier vs. Worker Tier
+	Web Env: (2*AZ + ASG + ELB + 2*EC2 with security group) 
+		ELB -> ASG (for 2 AZ) -> sends traffic to one of EC2
+	Worker env: (2*AZ + ASG + SQS queue- + 2*EC2 Instance)
+		SQS -< EC2 get SQS message from SQS
+		* Scale based on the number of SQS messages
+		* Can push messages to SQS queue from another Web Server Tier
+------------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk Deployment Modes
+	Single Instance great for dev
+		AZ (Elastic IP + EC2 Instance + RDS Master)
+
+	High Availability with Load Balancer Great for prod
+		ALB  + 2 AZ + ASG for 2 AZ + 2 EC2 Instances (1 in every AZ) + 2 RDS Masters ( 1 for every AZ)
+------------------------------------------------------------------------------------------------------------------------
+HandsOn
+	goto service 'Elastic Beanstalk'
+------------------------------------------------------------------------------------------------------------------------
+Beanstalk Deployment Options for Updates
+	All at once (deploy all in one go) - faster, but instances aren't available to serve traffic for a bit (dpwntime)
+	Rolling: update a few instances at a time (bucket), and than move onto the next bucket once the first bucket is healthy
+	Rolling with additional batches: like rolling, but spins up new instances to move the batch (so that the old applicatiob is still available)
+	Immutable : spins up new instances in a new ASG, deploys version to these instances, and than swaps all the instances when everything is healthy
+	Blue Green : create a new environment and switch over when ready
+	Traffic Splitting : canary testing - send a small % of traffic to new deployment 
+--------------------------------------------------------------------------------------------------------------------------
+All at ones :
+	we have 4 instances for update 
+	all 4 instances will be updated
+	all 4 instances will be deployed
+
+	fastest deployment
+	Application has downtime	
+	Great for quick iterations in development environment
+	No additional cost
+---------------------------------------------------------------------------------------------------------------------------
+Rolling :
+	we have 4 instances for update
+	2 of them updated (if bucket size was set to 2)
+	and deployed
+	nest 2 will be updated
+	and deployer
+	
+	Application is running below capacity
+	Can set the bucket size
+	Application is running both versions simultaneously
+	No additional cost
+	Long deployment
+-------------------------------------------------------------------------------------------------------------------------------
+Rolling with additional batches
+	we have 4 instances for update
+	+2 new will be created (common size = 6)
+	new 2 will be updated 
+	2 old will be terminated and updated and deployed
+	next 2 old will be terminated, updated and deployed
+	+2 new - will be terminated
+
+	Apploication is running at capacity
+	Can set the bucket size
+	Application is running both versions simultaneously
+	Small additional cost
+	Additional batch is removed at the end of the deployment
+	Longer deployment
+	Good for prod  because always we have not less than 4 instances
+------------------------------------------------------------------------------------------------------------------------------
+Immutable :
+	we have 3 instances into ASG
+	will be created one more ASG with 3 instances too
+	if OK 3 new instances will be moved into first ASG
+	old 3 instances in first ASG will be terminated
+
+	Zero downtime
+	New Code is deployed to new instances on a temporary ASG
+	High cost, double capacity
+	Longest deployment
+	Quick rollback in case of failures (just terminate new ASG)
+	Great for prod
+------------------------------------------------------------------------------------------------------------------------------
+Blue/Green (manual deployment)
+	we have env with 3 instances
+	we create new env with 3 intances
+	we configure route 53 for send 90% of traffic to old env and 10% to new
+	if new env works good - redirrecting all traffic to new env
+-----------------------------------------------------------------------------------------------------------------------------
+Traffic Splitting (like BLue/Green but automatically)
+        we have ASG with 3 instances                                                                           
+        we create new ASG with 3 intances                                                                                                       
+	we configure ALB for send 90% of traffic to old ASG and 10% to new	
+
+	Canary Testing
+	New application version is deployed to a temporary ASG with the same capacity
+	A small % of traffic is sent to the temporary ASG for a configurable amount of time
+	Deployment health is monitored
+	If there's a deployment failure, this triggers an automated rollback (very quick)
+	No application downtime
+	New instances are migrated from the temporary to the original ASG
+	Old application version is then terminated
+----------------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk CLI
+	We can install an additional CLI called the "EB cli" which makes working with Beanstalk from the CLI easier
+	Basic commands are:
+		eb create
+		eb status
+		eb health
+		eb events
+		eb logs
+		eb open
+		eb deploy
+		eb config
+		eb terminate
+	It's helpfull for your automated deployment pipelines!
+----------------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk Deployment Process
+	Describe dependencies (requirements.txt for Python, package.json for Node.js)
+	Package code as zip, and describe dependencies
+		Python : requirements.txt
+		Node.js : packege.json
+	Console : upload zip file (creates new app version), and then deploy
+	CLI : create new app version using CLI (uploades zip), and then deploy
+
+	Elastic Beanstalk will deploy the zip on each EC2 instance, resolve dependencies and start the application
+----------------------------------------------------------------------------------------------------------------------------
+Beanstalk lifecycle Policy
+	Elastic Beanstalk can store at most 1000 application versions
+	Id you don't remove old versions, you won't be able deploy anymore
+	To phase out old application versions, use a lifecycle policy
+		Based on time (old versions are removed)
+		Bases on space (when you have too many versions)
+	Versions that are currently used won't be deleted
+	Option not to delete the source bundle in S3 prevent data loss	
+=============================================================================================================================
+Elastic Beanstalk Extensions
+	A zip file containing our code must be deployed to Elastic Beanstalk
+	All the parameners set in the UI can be configured with code using files
+	Requirements : 
+		in the .ebextensions/ directory in the root of source code
+		YAML/JSON format
+		.config extensions (example: logging.config)
+		Able to modify some default settings using : option_settings
+		Ability to add resources such as RDS, ElastiCache, DynamoDB, etc ...
+
+	Resources managed by .ebextensions get deleted if the environment goes away
+============================================================================================================================
+Elastic Beanstalk Under the Hood
+	Under the hood, Elastic Beanstalk relies on CloudFormation
+	CloudFormation is used to provision other AWS services (we'll see later)
+	Use case: you can define CloudFormation resources in your .ebextensions to provision ElastiCache, an S3 bucket, anything you want!
+	Let's have a sneak peak into it!
+-----------------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk Cloning
+	Clone an environment with the exact same configuration
+	Usefull for deployint a test version of your application
+
+	All resources and configuration are preserved:
+		Load Balancer type and configuration
+		RDS database type (but the data is not preserved)
+		Environment variables
+	After cloning an environment, you can change settings
+=============================================================================================================================
+Elastic Beanstalk Migration : Load Balancer
+	After ,creating Elastic Beanstalk environment, you cannot change the Elastic Load Balancer type (only the configuration)
+	To migrate:
+		1. Create a new environment with the same configuration exept LB (can't clone)
+		2. deploy your application onto the new environment
+		3. perform a CNAME swap or Route 53 update
+-----------------------------------------------------------------------------------------------------------------------------
+RDS with Elastic Beanstalk
+	RDS can be provisioned with Beanstalk, which is great for dev / test
+	This is not great for prod as the database lifecycle is tied to the Beanstalk environment lifecycle
+	The best for prod is to separately create an RDS database and provide our EB application with the connection string
+------------------------------------------------------------------------------------------------------------------------------
+Elastic Beanstalk Migration: Decouple RDS
+	1. Create a snapshot of RDS DB (as a safeguard)
+	2. GO to the RDS console and protect the RDS database from deletion
+	3. Create a new Elastic Beanstalk environment, without RDS, point your application  to existing RDS
+	4. perform a CNAME swap (blue/green) or route 53 update, confirm working
+	5. Terminate the old environment (RDS won't be deleted)
+	6. delete CLoudFormation stack (in DELETE_FAILED state) 
+--------------------------------------------------------------------------------------------------------------------------------
+Beanstalk clenup
+	goto Elastic Beanstalk -> Applications  -> Delete Application
+--------------------------------------------------------------------------------------------------------------------------------
+https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features-managing-env-tiers.html - 
+
+
+	
+	
+
+	
+		
+
+
+		                                                    `
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+services by zones :
+https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/?p=ngi&loc=4&refid=ha_awssm-9045_tnc
+
+configure CLI
+ 1) generate access keys for user
+ 2) install aws CLI
+ 3) run in console: aws configure

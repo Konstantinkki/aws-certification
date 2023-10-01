@@ -1,0 +1,552 @@
+Cloud formation Overview
+	
+Infrastructure as Code 
+	Currently, we have been doing a lot of manual work
+	All this manual work will be very tough to reproduce:
+		In another region
+		in another AWS account
+		Within the same region if everything was deleted
+
+	Wouldn't it be great, if all our infrastructure was ... code?	
+	That code would be deployed and create / update / delete /our infrastructure
+------------------------------------------------------------------------------------------
+What is CloudFormation
+	CloudFormation is a declarative way of outlining your AWS Infrastructure, for any resources (most of them are supported).
+	For example, within a CloudFormation template, you say: 
+		i want a security group
+		i want 2 EC2 machines using this security group
+		i want 2 Elastic IPs for these EC2 machines
+		i want an S3 bucket
+		i want a load balancer (ELB) in front of these machines
+	Then CloudFormation creates those for you, in the 'right order' with the 'exact configuration' that you specify
+--------------------------------------------------------------------------------------------
+Benefits of AWS CloudFormation
+	Infrastructure as code 
+		No resources are manually created, which is excellent for control	
+		The code can be version controlled for example using git
+		Changes to the infrastructure are reviewed through code
+	Cost
+		Each resources within the stack is stagged with an identifier so you can easily see how much a stack costs you
+		You can estimate the costs of your resources using the CloudFormation template
+		Saving strategy: In Dev, you could automation deleteon of templates at 5 PM and recreated at 8 AM, Safely
+	Productivity
+		Ability to destroy and re-create an infrastructure on the cloud on the fly
+		Automated generation of Diagram for your templates!
+		Declarative programming (no need to figure out ordering and orchestration)
+	Separation of concern: create many stacks for many apps, and many layers. Ex:
+		VPC stack
+		Network stack
+		App stacks
+	Don't re-invent the wheel
+		Leverage existing templates on the web!
+		Leverage the documentation
+--------------------------------------------------------------------------------------------------
+How CloudFormation Works
+	Templates have to be uploaded in S3 and then referenced in CloudFormation
+	TO update a template, we can't edit previous ones. We have to re-upload a new version of the template to AWS
+	Stacks  are identified by name 
+	Deleting a stack deletes every single artifact that was created by CloudFormation
+--------------------------------------------------------------------------------------------------
+Deploy CloudFormation templates
+	Manual way : 
+		Editing templates in the CLoudFormation Designer 
+	Automated way : 
+		Editing templates in a YAML file
+		Using the AWS CLI to deploy the templates 
+		Recommended way when you fully want to automate your flow
+		
+---------------------------------------------------------------------------------------------------
+CloudFormation Building Blocks
+	Templates components (one course section for each)
+	1. Resources your AWS resources declared in the template (MANDATORY)
+	2. Parameters: the dynamic inputs for your template
+	3. Mappings : the static variables for your template
+	4. Outputs : References to what has been created
+	5. Conditionals : List of conditions to perform resource creation
+	6. Metadata 
+
+	Templates helpers: 
+	1. References
+	2. Functions
+-----------------------------------------------------------------------------------------------------
+Note :
+	This is an introduction to CloudFormation
+		It takes over 3 hours to properly learn and master CloudFormation
+		This section is meant so you get a good idea of how it works 
+		We'll be slightly less hands-on than in other sections
+
+		We'll learn everything we need to answer questions for the exam
+		The exam does not require you to actually write CloudFormation
+		The exam expects you to understand how to read CloudFormation
+=====================================================================================================
+Introductory Example
+	We're going to create a simple EC2 instance
+	Than we're going to create to add an Elastic IP to it
+	And we're going to add two security groups to it
+	For now, forget about  the code syntax,
+	We'll look at the structure of the files later on
+
+	We'll see how in no-time, we are able to get started with CloudFormation
+
+	gpto CloudFormation  - create Stack - select example file - wait untill created instance
+
+=======================================================================================================
+YAML Crash Course
+	YAML and JSON are the languages you can use for CloudFormation
+	JSON is horrible for CF
+	YAML is great in so many ways
+	Let's learn a bit about it!
+
+	Key value Pairs
+	Nested objects 
+	Support Arrays
+	Multi line strings
+	Can include comments!
+---------------------------------------------------------------------------------------------------------
+What are resources ?
+	Resources are the core of your CloudFormation template (MANDATORY)
+	They represent the different AWS Components that will be created and configured
+	Resources are declared and can reference each other
+
+	AWS figures out creation, updates and deletes of resources for us
+	There are over 224 types of resources
+	Resource types identifiers are of the form:
+		AWS::aws-product-name::data-type-name
+---------------------------------------------------------------------------------------------------------
+how do i find resources documentation?
+	i can't teach you all of the 224 resources, but i can teach you how to learn how to use them.
+	All the resources can be found here :
+		https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html	
+----------------------------------------------------------------------------------------------------------
+FAQ for resources
+	Can i create dynamic amount of resources?
+		No, you can't. Everything in the CloudFormation template has to be declared. You can't perform code generation there
+
+	Is every AWS Service supported?
+		Almost. Only a select few niches are not there yet
+		You can work around that using AWS Lambda Custom Resources
+-----------------------------------------------------------------------------------------------------------
+What are parameters?
+	Parameters are a way to provide inputs to your AWS CLoudFormation template
+	They're important to know about if : 
+		You want to reuse your templates across the company
+		Some inputs can not be determinated ahead of time
+	Parameters are extremely poerful, controlled, and can prevent errors from happening in your templates thanks to types
+------------------------------------------------------------------------------------------------------------
+When should you use a parameter?
+	Ask yourself this:
+		Is this CloudFormation resource configuration likely to change in the future?
+		If so, make it a parameter.
+	You won't have to re-upload a template to change its content
+
+	Example: 
+	Parameters:
+	    SecurityGroupDescription:
+		Description: Security Group Description(Simple parameter)
+		Type: String
+------------------------------------------------------------------------------------------------------------
+Parameters Settings
+	Parameters can be controlled by all these settings:
+	Type:
+	    String
+	    Number
+	    CommaDelimitedList
+	    List<Type>
+	    AWS Parameter (to helpcatch invalid values - match against existing values in the AWS Account)
+	    Description
+	    Constraints
+	    ConstraintDescrition (String)
+	    Min/MaxLength
+	    Min/MaxValue
+	    Defaults
+	    AllowedValues (array)
+	    AllowedPattern (regexp)
+	    NoEcho (Boolean)
+------------------------------------------------------------------------------------------------------------
+How to Reference a Parameter
+	The Fn::Ref function can be leveraged to reference parameters
+	Parameters can be used anywhere in a template.
+	The shorthand for this in YAML is !Ref
+	The function can also reference other elements within the template
+
+	Example:
+		Parameters:
+		    VpvIdName:
+			Description: MyVPC
+			Type: String
+		DbSubnet1:
+		    Type: AWS::EC2::Subnet
+		    Properties:
+			VpcId: !Ref MyVPC
+
+--------------------------------------------------------------------------------------------------------------
+Concept : Pseudo Parameters
+	AWS offirs us pseudo parameters in any CloudFormation template.
+	These can be used at any time and are enabled by default
+
+	Reference Value:					Example Return Value: 
+	AWS::AccountId						1234567890
+	AWS::NotificationARNs					[arn:aws:sns:us-east-1:123456789012:MyTopic]
+	AWS::NoValue						Does not return a value.
+	AWS::Region						us-east-2
+	AWS::StackId						arn:aws:cloudformation:us-east-1:123456789012:stack/MyStack/1c2fa620-982a-11e3-aff7-50e2416294e0
+===============================================================================================================
+What are mappings?
+	Mappings are fixed variables within your CloudFormation Template.
+	They're very handy to differentiate between different environments (dev, prod), regions (AWS regions), AMI types, etc..
+	All the values are hardcoded within the template
+	
+	Example:
+		Mappings:			RegionMap:
+		    Mapping01:		    	    us-east-1:
+		       Key01:				"32": "ami-6411e20d"
+			  Name: Value01                 "64": "ami-7ab1e20d"
+		       Key02:		            us-west-1:
+                          Name: Value02                 "32": "ami-7711e20d"
+                       Key03                            "64": "ami-8811e20d"
+	                  Name: Value03             us-west-1:
+                                                        "32": "ami-9911e20d"
+	                                                "64": "ami-aa11e20d"
+-----------------------------------------------------------------------------------------------------------------
+When would you use mappings vs parameters?
+	Mappings are great when you know in advance all the values that can be taken and that they can deduced from variables such as
+		Region 
+		Availability Zone
+		AWS Account
+		Environment (dev vs prod)
+		Etc...
+	They allow safer control over the template.
+
+	Use parameters when the values are really user specific
+------------------------------------------------------------------------------------------------------------------
+Fn::FindInMap -  Accessing Mapping Values
+	We use Fn::FindInMap to return a named value from a specific key
+	Short form: 
+		!FindInMap [ MapName,  TopLevelKey, SecondLevelKey ]
+	Example: 
+		AWSTemplateFormatVersion: "2010-09-09"
+		Mappings:
+		    RegionMap:
+			us-east-1:
+			    "32": "ami-11111111"
+			    "64": "ami-22222222"
+			us-west-1:
+			    "32": "ami-33333333"
+			    "64": "ami-44444444"
+			eu-west-1:
+			    "32": "ami-55555555"		
+			    "64": "ami-66666666"
+			ap-southeast:
+			    "32": "ami-77777777"
+			    "64": "ami-88888888"
+			ap-northeast:
+			    "32": "ami-99999999"
+			    "64": "ami-10101010"
+		Resources:
+		    myEc2Instance:
+			Type: "AWS::EC2::Instance"
+			Properties:	
+			    ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", 32 ]
+---------------------------------------------------------------------------------------------------
+What are outputs?
+	The Outputs section declares optional outputs values that can import into other stacks (if you export them first)!
+	You can also view the outputs in the AWS COnsole or in using the AWS CLI
+	They're very usefull for example if you define a network CloudFormation, and output the vatiables such as VPC ID and your Subnet IDs
+	It's the best way to perform some collaboration cross stack, as you let expert handle their own part of the stack
+	You can't delete a CloudFormation Stack if its outputs are being referenced by another CLoudFormation stack
+
+----------------------------------------------------------------------------------------------------------
+Outputs Example:
+	Creating a SSH Security Group as part of one template
+	We create an output that references that security group
+		Outputs:
+		    StackSSHSecurityGroup:
+			Description: The SSH Security Group for our Company
+			Value: !Ref MyCompanyWideSSHSecurityGroup
+			Export:
+			    Name: SSHSecurityGroup
+----------------------------------------------------------------------------------------------------------
+Cross Stack Reference
+	We than create a second template that leverages that security group
+	For this, we use the Fn::ImportValues function
+	You can't delete the underlying stack untill all the references are deleted too.
+
+	Example :
+	
+	Resources:
+	    MySecurityInstance:
+		Type: AWS::EC2::Instance
+		Properties:
+		    AvailabilityZone: us-east-1a
+		    ImageId: ami-a4c7adb2
+		    InstanceType: t2.micro
+		    SecurityGroups:
+			- !ImportValue SSHSecurityGroup	
+----------------------------------------------------------------------------------------------------------
+What are conditions used for?
+	Conditions are used to control the creation of resources or outputs based on a condition
+	Conditions can be whatever you want them to be, but commin ones are:
+		Environment (dev /test/prod)
+		AWS Region
+		Any Parameter Value
+	Each condition can reference another condition, parameter value or mapping
+----------------------------------------------------------------------------------------------------------
+How to define a condition?
+	Conditions: 
+	    CreateProdResources: !Equals [ !Ref EnvType, prod ]  - compare value of var EnvType and string 'prod'
+
+	The logical ID is for you to choose. it's how you name condition
+	The intrinsic function (logical) can be any of the following:
+		Fn::And
+		Fn::Equals
+		Fn::If
+		Fn::Not
+		Fn::Or
+-----------------------------------------------------------------------------------------------------------
+Using a Condition
+	Conditions can be applied to resources / outputs / etc ...
+	
+	Example:
+	    Resources:
+		MountPoint:
+		    Type: "AWS::EC2::VolumeAttachment"
+		    Condition: CreateProdResources
+-----------------------------------------------------------------------------------------------------------
+CloudFormation IntristicFunctions - MUST KNOW
+	Ref
+	Fn::GetAtt
+	Fn::FindInMap
+	Fn::ImportValue
+	Fn::Join
+	Fn::Sub
+	Condition Functions (Fn::If, Fn::Not, Fn::Equals, etc ...)
+-----------------------------------------------------------------------------------------------------------
+Fn::Ref
+	The Fn::Ref function can be leveraged to reference
+		Parameters => returns the value of the parameter
+		Resources => returns the physical ID of the underlying resource (ex: EC2 ID)
+	The shorthand for this in YAML is !Ref
+
+	Example:
+	    DbSubnet1:
+		Type: AWS::EC2::Subnet
+		Properties:
+		    VpcId: !Ref MyVPC
+------------------------------------------------------------------------------------------------------------
+Fn::GetAtt - get attributes predefined by AWS
+	Attributes are attached to any resources you create
+	To know the attributes of your resources, the best place to look at is the documentation
+	For example : the AZ of an EC2 machine!
+
+	Example:
+		Resources: 
+		    EC2Instance:
+			Type:"AWS::EC2::Instance"
+			Properties: 
+			    ImageId : ami-1234567
+			    InstanceType: t2.micro
+              ---------------------------------------
+		NewVolume:
+		    Type: "AWS::EC2::Volume"
+		    Condition: CreateProdResources
+		    Properties:
+			Size: 100
+			AvailabilityZone:
+			    !GetAtt EC2Instance.AvailabilityZone
+--------------------------------------------------------------------------------------------------------------
+Fn::FindInMAp
+Accessing Mapping Values
+	We use Fn::FindInMap to return a named value from a specific key
+	Ex: 
+		!FindInMap [ MapName, TopLevelKey, SecondLevelKey ]
+---------------------------------------------------------------------------------------------------------------
+Fn::ImportValue
+	Import values that are exportad in other templates
+	For this, we use the Fn::ImportValue function
+
+	Resources:
+	    MySecurityInstance:
+		Type: AWS::EC2::Instance
+		Properties:
+		    AvailabilityZone: us-east-1a
+		    ImageId: ami-12345678
+		    InstanceType: t2.micro
+		    SecurityGroups:
+			- !ImportValue SSHSecurityGroup
+---------------------------------------------------------------------------------------------------------------
+Fn:Join
+	Join values with a delimiter
+		!Join [delimiter, [ comma delimited list of values ]]
+	
+		!Join [":",[a,b,c]] returns => "a:b:c"	
+---------------------------------------------------------------------------------------------------------------
+Function Fn::Sub
+	Fn::Sub, or !Sub as a shorthand, is used to substitute variables from a text. 
+		It's a very handy function that will allow you to fully customize your template 
+
+	For example, you can combine Fn::Sub with References or AWS Pseudo variables!
+	String must contain ${VariableName} and will substitute them
+	
+	!Sub
+	    - String
+	    - {Var1Name:Var1Value, Var2Name:Var2Value}
+
+	!Sub String - find and replace all known variables
+---------------------------------------------------------------------------------------------------------------
+Condition Functions
+	Conditions:
+	    CreateProdResources: !Equals [!Ref EnvType, prod]
+ 	The Logical ID is for you to choose. It's how you name condition
+	The intrinsic function (logical) can be any of the following:
+		Fn::And
+		Fn::Equals
+		Fn::If
+		Fn::Not
+		Fn::Or
+===============================================================================================================
+CloudFormation Rallbacks
+	Stack Creation Fails:
+		Default : everythyng rolls back (gets deleted). We can look at the log
+		Option to disable rollback and troubleshooot what happend
+
+	Stack Update Fails :
+		The stack automatically rolls back to the previous known working state
+		Ability to see in the log what happened and error messages
+===============================================================================================================
+CloudFormation Stack Notificatios
+	Send Stack events to SNS Topic (Email, Lambda, ...)
+	Enable SNS integration using Stack Options
+
+	if SNS Integration is enabled 
+		CloudFormation sends  events -------> to SNS
+
+	example : we want get emails only about Rollbacks
+	Solution : 
+		
+		CloudFormation  -----event---> SNS ---triggers---> Lambda (filtering only ROLLBACKS) ---send info to--> second SNS  ---send email to-->user
+================================================================================================================
+ChangeSets
+	When you update a stack, you need to know what changes before it happens for greater confidence
+	ChangeSets won't say if the update will be successful
+
+	Original stack ---create Changeset---> change set --View Change set--> change set ---execute Changeset ---> AWS CloudFormation
+----------------------------------------------------------------------------------------------------------------
+Nested stacks
+	Nested stacks are stacks as part of other stacks
+	They allow you to isolate repeated patterns / common components in separate stack and call them from other stacks
+
+	Example :
+		Load Balancer configuration that is re-used
+		Security Group are considered best practice
+	Nested stacks are considered best practice
+	TO update a nested stack, always update the parent (root stack)
+--------------------------------------------------------------------------------------------------------------------
+CloudFormation - Cross vs Nested Stacks
+	Cross Stacks  (may be used in any stack public )
+		Helpfull when stacks have different lifecycles
+		Use Outputs Export and FN::ImportValue
+		When you need to pass export values to many stacks (VPC Id, etc...)
+
+	Nested Stacks  (may be used inside stack private)
+		Helpful when components must be re-used
+		Ex: re-use how to properly configure an Application Load Balancer
+		The nested stack only is important to the higher level stack (it's not shared)
+--------------------------------------------------------------------------------------------------------------------
+CloudFormation - StackSet
+	Create, update, or delete stacks across 'multiple accounts and regions' with a single operation
+	Administrator account to create StackSets
+	Trusted accounts to create, update, delete stack instances from StackSets
+	When you upload a stack instances are updated throughout all accounts and regions
+--------------------------------------------------------------------------------------------------------------------
+CloudFormation Drift
+	CloudFormation allows you to create infrastructure
+	But it doesn't protect you against manual configuration changes
+	How do we know if our resources have drifted?
+
+	We can use CloudFormation drift !
+
+	Not All resources are supported yet :
+		https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
+ 
+goto CloudFormation -> select Stack -> Stack Actions -> Detect Drift; View Drift results
+=====================================================================================================================
+CloudFormation Stack Policies
+	During a CloudFormation Stack update, all update actions are allowed on all resources (default)
+	A Stack Policy is a JSON document that defines the update actions that are allowed ona specific resources during Stack Updates
+	Protect resources from unintentional updates 
+	When you set a Stack Policy, all resources in the Stack are protected by default
+	Specify an explicit ALLOW for the resources you want to be allowed to be updated
+
+{
+"Statement": [
+	{
+		"Effect":"Allow",
+		"Action":"Update:*",
+		"Principal":"*",
+		"Resource":"*"
+	},
+	{
+		"Effect":"Deny",
+		"Action":"Update:*",
+		"Principal":"*",
+		"Resource":"LogicalResourceId/ProductionDatabase"
+	}
+   ]
+}
+=======================================================================================================================
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+	
+
+	
+
+ 
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

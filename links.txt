@@ -1,0 +1,9 @@
+all properties of all components :
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
+
+AWS Drift:
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cnf-stack-drift-resource-list.html
+
+Custom mrtric
+https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-data.html
+

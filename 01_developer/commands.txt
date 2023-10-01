@@ -1,0 +1,7 @@
+CLI commands 
+show users list : 
+  aws iam list-users  
+
+configure CLI : 
+  aws configure 
+ //and set AWS Access Key, AWS Secret Access Key, region name, output format 

@@ -1,0 +1,22 @@
+questions 
+https://www.whizlabs.com/blog/aws-certifications/
+https://www.whizlabs.com/blog/aws-developer-associate-exam-questions/
+
+https://www.knowledgehut.com/practice-tests/aws-certified-developer-associate
+
+https://d1.awsstatic.com/training-and-certification/docs-dev-associate/AWS-Certified-Developer-Associate_Sample-Questions.pdf
+
+https://www.azfiles.ru/extension/vce.html - app for open vce files
+https://www.exam-labs.com/certification/AWS-Certified-Developer-Associate - vce exams
+
+book 80$
+https://www.exam-labs.com/dumps/AWS-Certified-Developer-Associate-DVA-C02?gclid=CjwKCAjw0N6hBhAUEiwAXab-TdwZBB8g7i1pEWpw6TyvNXYKG-Tf3WRzuJo7V9GstBdH2dOZ3YyoVRoCCSsQAvD_BwE
+ youtube
+https://www.youtube.com/watch?v=jkHVr5W2Xwc
+
+aws skill builder 
+https://aws.amazon.com/training/digital/?sc_icampaign=evergreen_ribbon_testing_free_aws_training_lm&sc_ichannel=ha&sc_icontent=awssm-9045_tnc&sc_iplace=ribbon&trk=ha_awssm-9045_tnc
+
+free temp mail box:
+www.mailinator.com
+
