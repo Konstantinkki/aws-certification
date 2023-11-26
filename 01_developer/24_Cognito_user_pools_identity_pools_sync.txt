@@ -1,0 +1,269 @@
+Amazon Cognito
+	Give users an identity to interact with our  web of mobile application
+	Cognito User Pools:
+		Sign in functionallity for app users
+		Integrate with API Gateway & Application Load Balancer
+	Cognito Identity pools (Federated Identity):
+		Provide AWS credentials to users to they can acccess AWS resources directly
+		Integrate with Cognito User Pools as an identity provider
+	Cognito vs IAM: "hundreds of users", "mobile users", "authenticate with SAML"
+-----------------------------------------------------------------------------------------------
+Cognito USer Pools (CUP) - User Features
+	Create a serverless database of user for your web & mobile apps
+	Simple login : Username (or email) /password combination
+	Password reset
+	Email & phone number Verification
+	Multi-factor authentication (MFA)
+	Federated Identities: users from Facebook, Google, SAML
+	Feature : block users if their credentials are compromised elsewhere
+	Login sends back a JSON Web Token (JWT)
+-----------------------------------------------------------------------------------------------
+
+   	Mobile app                          google
+   	            ------>Cognito<---------  FBook
+	Web App			|		SAML
+	                        |                OpenId
+	                        |
+	                 DB with users
+
+------------------
+CUP Integrations:
+            auth Retrive tocken
+         <-----------------------------> CUP
+	 |				 | evaluate token		
+	 |	  			 |
+	user ----rest API + token ---> API GW <----------> Lambda
+
+-----------------------------------
+                         authenticate
+                    --------------------> CUP
+                    |
+                    |
+user ----> ALB + Listener & rules
+                    |
+                    |   backend
+                    --------------> Target Group(EC2 lambda CF)
+===================================================================================================
+Cognito User Pools - Lambda Trigger
+	CUP can invoke a Lambda function synchronously on these triggers:
+
+User Pool Flow					Operation 					Description
+Authentication Event          Pre Authentication Lambda Trigger              Custom validation to accept or deny the sign-in request
+                              Post Authentication Lambda Trigger		Event Login for custom analitics
+                              Pre Token Generation LAmbda trigger		Augment to suppress token claims
+-----
+Sign Up				Pre Sign-up Lambda trigger			Custom validation to accept or deny the sign-up request
+				Post Confirmation Lambda trigger		Custom welcome messages ot event logging for custom analytics
+				Migrate User Lambda Trigger			Migrate a user from an existing user directory to user pools
+-------
+Messages			Custom Message Lambda Trigger			Advanced customization and localization of messages
+------
+Token Creation			Pre Token Generation Lambda Trigger		Add or remove attribute in Id Token
+------------------------------------------------------------------------------------------------------
+Cognito User Pools - Hosted Authentication UI
+	Cognito has a hosted authentication UI that you can add to your app to handle sign-up and sign-in workflows
+	Using the hosted UI, you have a foundation for integration with social logins, OIDC or SAML
+	Can customize with a custom logo and custom CSS
+----------------------------------------------------------------------------------------------------------
+CUP - Hosted UI Custom Domain
+	For custom domains, you must create an ACM certificate in us-east-1
+	The custom domain must be defined in the "App Integration" section
+--------------------------------------------------------------------------------------------------------
+CUP - Adaptive Authentication
+	Block sign-ins or require MFA if the login appears suspicious
+	Cognito examines each sign-in attempt and generates a risk score (low, medium, high) for how likely the sign-in request is to be from a malicious attacker 
+        Users are prompted for a second MFA only when risk is detected
+	Risk score is based on different factors such as if the user has used the same device, location, or IP address
+	Checks for compromised credentials, account takeover protection, protection, and phone and email verification
+	Integration with CloudWatch Logs (sign-in attepmts, risk score, failed challenges...)
+----------------------------------------------------------------------------------------------------------
+Decoding a ID Token; JWT - JSON Web Token
+	CUP issues JWT token (Base64 encoded):
+		Header 
+	        Payload
+	        Signature
+	The Signature must be verified to ensure the JWT can be trusted
+	Libraries can help you verify the validity of JWT token issued by cognito user pools
+	The Pauliad will contain the user information (sub UUID, given_name, email, phone_number, attributes...)
+	From the sub UUID, you can retrive all users details from Cognito / OIDC
+==============================================================================================================
+Application Load Balancer - Authenticate Users
+	Your ALB can securely authenticate users
+		Offload the work of authenticating users to your LB
+		Your application can focus on their business logic
+	Authenticate users through:
+		Identity Provider (IdP): OpenId Connect (OIDC) compliant
+		Cognito User Pools:
+			Social IdPs, such as Amazon, Facebook or Google
+			Corporate identities using SAML, LDAP, or Microsoft AD
+	Must use an HTTPS listener to set authenticate-oidc & authenticate-cognito rules
+	OnUnauthenticatedRequest - authenticate (default), deny allow
+----------------------------------------------------------------------------------------------------------------
+ALB - Auth through Cognito User Pools
+	Create Cognito User Pool, CLient and Domain
+	Make sure an ID token is returned 
+	Add the social or Corporate IdP if needed
+	Several URL redirections are necessary
+	Allow your Cognito User Pool Domain on your IdP app's callback URL, For Wxample : 
+		"https://domain-prefix.auth.<region>.amazoncognito.com/saml2/idpresponse"
+		"https://user-pool-domain/oauth2/idpresponse"
+---------------------------------------------------------------------------------------------------------------------
+ALB - Auth. Through an identity Provider (Idp) That is OpenId Connect (OIDC) Compliant
+	Configure a Client & Client Secret
+	Allow redirect from OIDC to your Application LB DNS name (AWS provided) and CNAME (DNS Alias of your app)
+		"https://DNS/oauth2/idpresponce"
+		"https://CNAME/oauth2/idpresponse"
+=====================================================================================
+Cognito Identity Pools (Federated Identities)
+	Get identities  for "users" so they obtain temporary AWS credentials
+	Your identity pool (e.g. identity source) can include:
+		Public Providers (Login with Amazon, Fb, Google, Apple)
+		Users in an Amazon Cognito user pool 
+		OpenID Connect Providers- & SAML Identity Providers
+		Developer Authenticated Identities (custom login server)
+		Cognito identity pools allow for unauthenticated (guest) access
+
+	Users can then access AWS services directly or through API Gateway
+		The IAM policies applied to the credentials are defined in Cognito
+		They can be customized based on user_id for fine grained control
+---------------------------------------------------------------------------------------
+Cognito Identity Pools - Diagram 
+	1. web/mobile App --connect to ->  FB, Google, SAML, OpenID, Cognito User pools to get token
+	2. web/mob ---send token----> Cognito id pool
+	3. cognito checks token with token creater
+	4. cognito creates temp credentials  (STS)
+	5. cognito back temp token to web/mob app
+	6. web/mob connects to AWS services
+---------------------------------------------------------------------------------------- 
+Cognito Identity Pools  -Diagram with CUP
+                                                       <-----------> Internal DB
+	1. web/mob ---get token---> Cognito User Pool  <----------->social (FB, Google...)
+	2. web/mob ---sends token---> Cognito Id Pools <------validates---> CUP
+	3. Cognito Identity Pools --creates temp cred---> STS
+	4. Cognito Identity Pools --back access token---> web/mob
+	5. web/mob---->connects to AWS services
+------------------------------------------------------------------------------------------
+Cognito Identity Pools - IAM Roles
+	Default IAM role for authenticated and guest users
+	Define rules to choose the role for each user based on the user's ID
+	You can partition yours  access using policy variables
+
+	IAM credentials are obtained by Cognito Identity Pools through STS
+	The roles nust have a "trust" policy of Cognito Identity Pools 
+----------------------------------------------------------------------------------------
+Cognito Identity Pools - Guest User example
+{
+    "Version":"2020-10-10",
+    "Statement":[
+	{
+	    "Action":[
+		"s3:GetObject"
+	    ],
+	    "Effect":"Allow",
+	    "Resource":[
+		"arn:aws:s3:::mybucket/assets/my_picture.jpg"
+	    ]	
+	}
+    ]
+}
+---------------------------------------------------------------------------------------
+Cognito Identity Pools - Policy variable on S3
+{
+    "Version":"2020-10-10",
+    "Statement":[
+        {
+            "Action":["s3:ListBucket"],
+            "Effect":"Allow",
+            "Resource":["arn:aws:s3:::mybucket"],
+	    "Condition":{"StringLike": {"s3:prefix":["${cognito-identity.amazonaws.com:sub}"]}}
+        },
+	{
+		"Action":[
+		    "s3:GetObject",
+		    "s3:PutObject"
+		],
+		"Effect":"Allow",
+		"Resource":["arn:aws:s3:::mybucket/${cognito-identity.amazonaws.com:sub}/*"] 
+
+	}
+    ]
+}
+--------------------------------------------------------------------------------------------
+Cognito Identity Pools - DynamoDB
+	
+{
+    "Version":"2020-10-10",
+
+    "Statement":[
+        {
+	    "Effect":"Allow",
+            "Action":[
+			"dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", 
+			"dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", 
+			"dynamodb:BatchWriteItem"
+	    ],
+            
+            "Resource":["arn:aws:dynamodb:us-west-2:123456789012:table/MyTable"],
+            "Condition":{
+		"ForAllValues:StringEquals":{
+			"dynamodb:LeadingKeys":[
+			    "${cognito-identity.amazonaws.com:sub}"
+			]
+		}
+
+
+	    ]}}
+        },
+    ]
+}
+===================================================================================================
+Cognito User Pools vs Identity Pools
+	Cognito User Pools (for authentication = identity verification)
+		Database of users for your web and mobile applications
+		Allows to federate login through Public Social, OIDC, SAML..
+		Can customize the hosted UI for authentication (including the logo)
+		Has triggers with AWS Lambda during the authentication flow
+		Adapt the sign-in experience to different risk levels (MFA. adaptive authentication, etc ...)
+	Cognito Identity Pools (for authorization = access control)
+		Obtain AWS credentials for your users
+		Users can login through Public Social, OIDC, SAML, & Cognito User Pools
+		Users can be unauthenticated (guests)
+		Users are mapped to IAM roles & policies, can leverage policy variables
+	CUP+CIP = authentication + authorization
+======================================================================================================
+ 
+
+
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

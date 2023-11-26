@@ -1,0 +1,151 @@
+What is KMS? - AWS Key management Service
+	Managed - Managed service that makes it easy for you to create and control the encryption keys used to encrypt your data.	
+	Integrated - Seamlesly integrated with many AWS services to make encrypting data in those services as easy as checking a box.
+	Simple - With KMS, it is simple to encrypt your data with encryption keys that you manage.
+---------------------
+When do we use KMS? 
+	whenever you are dealing with sensitive information.
+
+	Sensitive data that you want to keep secret
+	Customer Data
+	Financial Data
+	Database passwords
+	Secrets
+	Credentials
+----------------------
+KMS Integrates with : 
+	S3, RDS, DynamoDB, Lambda, EBS, EFS, CloudTrial, Developer Tools
+---------------------
+What is a CMK
+	1. Customer Master Key - Encrypt/decrypt data up to 4KB
+	2. What is it User For? - Generate / encrypt / decrypt / the Data Key.
+	3. Data Key - Used to encrypt / decrypt your data.
+---------------------
+Customer Master key:
+	1. Alias - Your applcation can refer to the alias when using the CMK.
+	2. Creation Date - The date and time when the CMK was created
+	3. Description - You can add your own description to describe the CMK.
+	4. Kay State - Enable, Disabled , pending, deletion, unavailable
+	5. Kay Material - Customer-provided or AWS-provided
+	6. Stays inside KMS - Can never be exported
+-------------------
+Set up CMK
+	1. Create alias and description, Choose key materials option. 
+		Alias ==> Description ==> Key Material
+	2. Key Administrative Permissions - IAM users and roles that can administrater (but not use) the key through the KMS API.
+		Users ==> Roles ==> Admin Permissions
+	3. Key Usage Permissions - IAM Users and roles that can use the key to encrypt and decrypt data
+		Users ==> Roles ==> Usage Permissions
+-------------------
+Exam Tips:
+	AWS- MAnaged CMK - AWS-provided and AWS-managed CMK. Used on your behalf with the AWS services integrated with KMS
+	Customer-Managed CMK - You create, own and manage yourself
+	Data Key - Encryption keys that you can use to encrypt data, Including larger amount of data. You can use a CMK to generate, encrypt, decrypt data kays
+=====================
+Understanding KMS API Calls - Commands
+
+	aws kms encrypt --key-id 3cd4b981-5640-4a6e-ade9-0ea1b4a7729b --plaintext fileb://secret.txt --output text --query CiphertextBlob | base64 --decode > encryptedsecret.txt
+	aws kms decrypt --ciphertext-blob fileb://encryptedsecret.txt --output text --query Plaintext | base64 --decode > decryptedsecret.txt
+	aws kms re-encrypt --destination-key-id 3cd4b981-5640-4a6e-ade9-0ea1b4a7729b --ciphertext-blob fileb://encryptedsecret.txt | base64 > newencryption.txt 
+	aws kms enable-key-rotation --key-id 3cd4b981-5640-4a6e-ade9-0ea1b4a7729b
+	aws kms get-key-rotation-status --key-id 3cd4b981-5640-4a6e-ade9-0ea1b4a7729b
+	aws kms generate-data-key --key-id 3cd4b981-5640-4a6e-ade9-0ea1b4a7729b --key-spec AES_256
+
+---------------------
+Exam Tips
+	aws kms encrypt - Encrypts plaintext into ciphertext by using a customermaster key.
+	aws kms decrypt - Decrypts ciphertext that was encrypted by an AWS KMS customer master key (CMK)
+	aws kms re-encrypt - Decrypts ciphertext and then re-encrypt it entirely within AWS KMS (e.g. when you changethe CMK or manually rotate thr CMK)
+	aws kms enable-key-rotation - Enables automatic key rotation every 365 days.
+	aws kms generate-data-key - Uses the CMK to generate a data key to encrypt data > 4KB
+=====================
+Exploring Envelope Encryption
+	A process for encryptiong your data. It applies to files > 4KB
+
+	AWS KMS [CMK] -> GenerateDataKey API -> generate Data Key(Envelope Key) -> encrypts Data
+
+	Data key placed next to the data encrypted by CMK
+
+	CMK used for decrypt DataKey 
+	DataKey used for decrypt data
+---------------------
+Why Envelope Encryption? Why not encrypt the data using the CMK derectly?
+	Network - When you encrypt data directly with KMS it must be transferred over the network.
+	Performance - With envelope encryption, only the data key goes over the network, not your data.\
+	Benefits - The data key is used locally in your application or AWS service, avoiding the need to transfer large amounts of data to KMS
+---------------------
+Envelope Encryption
+	Encrypting the key that encrypts our data
+	The CMK is used to encrypt the data key (evelope key)
+	The data key encrypts our data
+	used for encrypting over 4KB
+	Using envelope encryption avoids sending all your data into KMS over the network
+	Remember the GenerateDataKey API call.
+======================
+Enabling and Disabling KMS Key Rotation - Demo
+	Create a Customer MAster Key (CMK)  - Accept All the default
+	After the Key Created - Click the Key rotation tab, select the option for automatic key rotation every year, and click Save
+	TO Disable Key Rortation - Deselect the option, and click Save
+--------------------------
+Auto encryption is available for CMKs
+KMS will rotate the cryptographic material on a yearly basis.
+it saves previous versions of the cryptographic material so that you can still decrypt the files that were previously encrypted
+===========================
+Certificate Management in AWS
+	What is AWS Certificate Management (ACM)?
+	What Are SSL/TLS Certificates?
+	ACM and CloudFront
+	Exam Tips
+--------------------
+What is AWS ACM
+	Create and manage public and private Secure Sockets Layer(SSL)/Transport Layer Security (TLS) certificates.
+	Can be used with AWS services like Elastic LB, CF, API GW and web applications
+---------------------
+What are SSL/TLS Certificates?
+	Digital certificates are used to verify the authenticity of a website
+	Enable a secure connection between visitors and the website
+
+	Used during the encryption process to encrypt data in transit
+	Provides a secure experience for customers.
+	Think of an online banking website or an e-comerce website.
+------------------------
+Use case 
+	A company's website hosted on EC2 instances and served by cloudFront that needs to host content securely 
+		and protect user data using SSL/TLS encryption
+	In the CF settings, you can optionally associate a custom SSL certificate using ACM.
+	The certificate can only be in the 'us-east-1' Region
+-----------------------
+Exam Tips
+	AWS Certificate Manager - Create and manage SSL/TLS certificates for 'securing' your website
+	Secure Connections - Enables secure connections to your website using HTTPS
+	CF -  When using ACM with CF, the certificate must be created in the us-east-1 Region.
+======================
+
+	
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+

@@ -1,0 +1,495 @@
+Introduction To CI/CD
+	What is CI/CD
+		1. Software Development Best Practice - Continuous Integration, Continious Delivery / Deployment
+		2. Make Small Changes & Automate Everything - Small, incremental code changes. Automate as much as possible e.g. 
+			code integration, build test and deployment
+		3. Why Is It so Cool ?  - Modern companies like AWS, Netflix, Google and FB have pioneered this approach to releasing code, 
+			successfully applying thousands of changes per day.
+------------------
+Benifits  of the CI/CD Approach
+	1. Automation Is Good - Fast, repeatable2, scalable, enables rapid deployment
+	2. Manual is Bad! - Slow, error prone, inconsistent, unscalable, complex.
+	3. Small Changes - Test each code change and catch bugs while they are small and simple to fix.
+------------------
+CI Workflow 
+	1. Shared Code Repository  - Multiple developers contributing to a shared code repository like Git. Frequently merging or Integrating code updates.
+	2. Automated Build - When changes appear in the code repository this triggers an automated build of the new code.
+	3. Automated Test - Tun automated tests to check the code locally before it is commited into the master code repository.
+-----------------
+Continuous Delivery & Deployment Workflow 
+	1. Code Is Merged - after successful tests, the code gets merged to the master repo.
+	2. Prepared for deployment - Code is build, tested and packaged for deployment.
+	3. Manual Decision - Humans may by involved in the decision to deploy the code. This is known as 'Continuous Delivery'
+	4. Or fully Automated - The system automatically deploys the new code as soon as it has been prepared for deployment. 
+		This is known as 'Continuous Deployment'
+----------------
+AWS Developer tools
+	1. CodeCommit - source & version control - Source control service enabling teams co collaborate on code, html pages, scripts, images and binaries
+	2. CodeBuild - Automated Build - Compiles source code, runs tests and produces packages that are ready to deploy.
+	3. CodeDeploy - Automated Deployment - Automates code deployments to any instance, including EC2, Lambda and on-premises.
+	4. CodePipeline - Manages the workflow - End-to-end solution, build, test, and deploy your  application every time there is a code change.
+----------------
+Exam Tips
+	1.CI - Inwtegrating or merging the code changes frequently - at least once per day Think - CodeCommit.
+	2. Cont. Delivery - Automating the build, test and deployment functions. Think CodeBuild and CodeDeploy
+	3. Cont. Deployment - Fully automated release process, code is deployed into Staging or Prod as soon as it has successfully passed through the
+		release pipeline. Think CodePipeline.
+---------------
+AWS Whitepaper : 
+	Practicing Continuous Integration & Continuous Deployment on AWS
+	Explains the features and benefits of using continuous integration, continuous delivery (CI/CD) and AWS tooling in your software development env.
+==================
+CodeDeploy 101 - Automated deployment EC2 instances, on-premises & lambda
+	Quickly release new features. Avoid downtime during deployments.
+	Avoid the risk associated with manual process
+------------------
+Code deploy Deployment Approaches
+	1. In-Place - The application is stopped on each instance and the new release is installed. Also known as a Rolling Update.
+	2. Blue/Green - New Instances are provisioned and the new release is installed on the new instances. Blue represents the active deployment, 
+			green is the new release.
+------------------
+Example In-Place Deployment: (one by one)
+	CodeDeploy installs the new version, known as a Revision
+	The instance comes back into service.
+	CodeDeploy continues to deploy to the next instance.
+-----------------
+How to Roll Back?
+	If you change your mind, there's no quick fix!
+	With an In-Place deployment you'll need to re-deploy the previous version which may be time consuming.
+----------------
+Blue/Green Deployment
+	The Green(new) instances are registered with the Elastic Load Balancer.
+	Traffic is routed away from the old env.
+	The Blue env. is eventually terminated (after green is was tested)
+---------------
+Roll Back Blue/Green - 
+	Easy to Switch between the old and new releases.
+        Only works if you didn't already terminate your old env.
+---------------
+Exam Tips
+	In-Place :
+		Capacity is reduced during the deployment.
+		Lambda is not supported.
+		Rolling Back involves a re-deploy
+		Great for deploying the first time
+	Blue/Green :
+		No capacity reduction.
+		Green instances can be created ahead of time.
+		Easy to switch between old and new .
+		You pay for 2 envs untill you terminate the old servers.
+=================
+Configuring CodeDeploy using The AppSpec File
+	1. Configuration file - Defines the parameters to be used during a CodeDeploy deployment.
+	2. EC2 - For EC2 and on-permises systems, Yaml only
+	3. Lambda - Yaml and JSON supported. Filestructure depends on whether you are deploying to Lambda or EC2
+----------------
+EC2 AppSpec File Structure
+	1. Version - Reserved for future use - Currently the allowed value is 0.0.
+	2. OS - Operating System Version - The OS version you are using, e.g. linux, windows
+	3. files - configuration files, packages - The location of any app files that need to be copied and where they should be copied to.
+	4. hooks - lifecycle event hooks - Scripts which need to run at set points in the deployment lifecycle. Hooks have a very specific run order.
+----------------
+Scrypts You Might Run During A Deployment
+	1. Uzip Files - UnZip application files prior to deployment.
+	2. Run Tests - Run functional tests on a newly deployment application.
+	3. Deal With Load Balancing - De-register and re-register instances with a load balancer.
+----------------
+Typical Folder setup:
+	appspec.yml
+	/Scripts
+	/Config
+	/Source
+	The appspec.yml must be placed in the root of the directory of your Revision, otherwise the deployment will fail.
+----------------
+Exam Tips:
+	1. Configuration File - Defines the parameters to be used by CodeDeploy e.g. OS, file, hooks.
+	2. appspec.yml - Should be saved in the root of your revision
+	3. Hooks - Lifecycle event hooks have a very specific run order.
+================
+CodeDeploy Lifecycle Event Hooks
+	1. BeforeInstall
+	2. AfterInstall
+	3. ApplicationStart
+	4. ValidationService
+---------------
+All in-place Deployment Run Order
+	Before - Tasks you want to run on instances Before they are de-registered from a Load Balancer
+	Block - De-register instances from a Load Balancer
+	After - Tasks you want to run on instances after they are de-registered from a Load Balancer
+
+	ApplicationStop
+	DownloadBundle
+	BeforeInstall
+	Install
+	AfterInstall
+	ApplicationStart
+	ValidateService
+	
+===============
+Code Pipeline 
+	A fully Managed CI/CD Service 
+	1. Orchestrates Build, Test & Deployment - The pipeline is triggered every there is a change to your code. Like a conductor in a orchestra
+	2. Automated Release Process - Fast, consistent, fewer mistakes. Enables quick release of new features and bug fixes.
+	3. CodePipeline integrates with : CodeCmmit, CodeBuild, CodeDeploy, Github, Jenkins, Elastic Beanstalk, CloudFormation, Lambda, Elastic Container Service
+---------------
+Example CodePipeline Workflow
+	1. CodePipeline - Workflow is Defined - The workflow begins when there is a change detected in your source code.
+	2. CodeCommit - New Code Appears - new source code appears in the CodeCommit repository
+	3. CodeBuild - Code is Built & Tested - CodeBuild immediately compiles source code, run tests and produces packages.
+	4. CodeDeploy - Application Deployed - the newly built application is deployed into a staging or prod env.
+---------------
+CodePipeline Exam Tips
+	1. CI/CD service - Orchestrates your end-to-end software release process based on a workflow you define.
+	2. Automated - Automatically triggers your pipeline as soon as a change is detected in your code repo.
+	3. Integrates With AWS & Third-Party tools - CodeCommit, CodeDeploy, Github, Jenkins, Elastic beanstalk, CloudFormation, Lambda, Elastic Container Service
+===============
+Code Pipeline Example : 
+	Architecture overview
+	    Task breakdown
+		1. Use CloudFormation to create an ec2 instance
+		2. Upload version 1 of our app to S3
+		3. Deploy the app using CodeDEploy
+		4. Build a CodePipeline and deploy version 2.
+		5. Configure an automated pipeline and deploy version 3
+===============
+Code Artifact
+	What is CodeArtifact?
+	What Are Artifacts?
+	Integrating with Public Repositories
+	Exam Tips
+----------------
+What is CodeArtifact ? - An artifact reository that makes it easy for developers to find the software packages they need.
+	Artifact Repository - Securely store, publish and share
+	Software Packages - Used in your software development process. A package is a bundle of software.
+	Including Open-Source - Open-source software from public repositories, as well as software developed in-house.
+----------------
+A central repository that can be used by all your developers to obtain the correct version of the software packages required for their projects
+
+public repos ========> CodeArtifact =========> developer
+npm Registry                                   CI/CD Systems (CodeBuild)
+python Package Index	
+Maven Central
+----------------
+What are artifacts? 
+	Documentation
+	Compiled applications
+	Deployable packages
+	Libwraries
+----------------
+AWS CodeArtifact - Integration with Public Repositories
+	Third-Party Software - Makes third-party software available for use (e.g., open-source packages from public repositories like npm Registry)
+	Approved Packages - IT leaders can make 'approved' packages available. Often this means the version that our engineering team is willing to support.
+	Efficient - Developers know where to find approved packages and can also publish and share their own packages by adding them to the repository.
+---------------
+CodeArtifact Exam Tips
+	An 'artifact repository' that makes it easy for developers to find the 'software packages' they need
+	1. PAckage - A bundle of software used in your software dev process
+	2. Approved - Developers can packages and can also publish their own
+	3. External connection - Create an 'upstream repository' with an 'external connection' to pull packages from an iexternal 'public repo' (npm Registry for Node.js packages)
+===============
+Code Artifact - Integrating with Oublic Repositories
+	1. Create a Domain - Create a repository (my-repo) and an upstream repository (npm-store).
+	2. Add an External Connection - Connect npm-store to the 'public npm registry'
+	3. Associate the Upstream Repo - 'Associate' npm-store with my-repo
+	4. Install a Package - Use the npm CLI to 'install' the Express 'package' into my-repo.
+--------------
+ Example : 
+***** Please note that if the command seems to hang and the command prompt does not reappear after running any of these commands, type the letter q in the CloudShell, your prompt will return and you can continue entering the next command **** 
+
+1) Create a domain:
+aws codeartifact create-domain --domain my-domain
+
+2) Create a repository in your domain:
+aws codeartifact create-repository --domain my-domain --repository my-repo
+
+3) Create an upstream repository for your my-repo repository:
+aws codeartifact create-repository --domain my-domain --repository npm-store
+
+4) Add an external connection to the npm public repository to your npm-store repository:
+aws codeartifact associate-external-connection --domain my-domain --repository npm-store --external-connection "public:npmjs"
+
+5) Associate the npm-store repository as an upstream repository to the my-repo repository:
+aws codeartifact update-repository --repository my-repo --domain my-domain --upstreams repositoryName=npm-store
+
+6) Configure the npm package manager with your my-repo repository (fetches an authorization token from CodeArtifact using your AWS credentials):
+aws codeartifact login --tool npm --repository my-repo --domain my-domain
+
+7) Use the npm CLI to install an npm package. For example, to install the popular npm package express, use the following command, if we don’t specify a version, this command will install the latest version available in the external repo:
+npm install express
+
+(express is a Node.js web application framework used to develop web and mobile applications)
+
+8) View the package you just installed in your my-repo repository:
+aws codeartifact list-packages --domain my-domain --repository my-repo
+
+
+You now have three CodeArtifact resources:
+* The domain my-domain.
+* The repository my-repo that is contained in my-domain. This repository has an npm package available to it.
+* The repository npm-store that is contained in my-domain. This repository has an external connection to the public npm repository and is associated as an upstream repository with the my-repo repository.
+
+9) To avoid further AWS charges, delete the resources you created:
+aws codeartifact delete-repository --domain my-domain --repository my-repo
+aws codeartifact delete-repository --domain my-domain --repository npm-store
+aws codeartifact delete-domain --domain my-domain
+
+***** Please note that if the command seems to hang and the command prompt does not reappear after running any of these commands, type the letter q in the CloudShell, your prompt will return and you can continue entering the next command **** 
+========================
+Elastic Container Service
+	Containers  - Similar to a virtual machine, more like a virtual operating environment.
+	Standardized - A standardized unit with everything the software needs to run e.g. libraries, system tools, code and runtime
+	Microservices - Applications are created using independent stateless components or microservices running in containers.
+	Docker or Windows Containers - Use Docker to create Linux containers and Windows containers for windows workloads
+
+	https://d1.awsstatic.com/whitepapers/DevOps/running-containerized-microservices-on-aws.pdf
+	https://12factor.net/
+-----------------------
+Architecture Of A Docker Container 
+	container = Code + Libs + VirtualKernel
+	need : 
+		Installed Docker
+		OperaTING System
+----------------------
+Advantages of Containers & Microservices Architecture
+	Highly Scalable - If y=the application becomes over loaded, scale only the services you need to.
+	Fault Tolerannt - A single error in one of your containers shouldn't bring down your entire app.
+	Easy TO Maintain - Easier to maintain, update and change than large monolithic applications.
+----------------------
+Where Does ECS Fit in ?
+	What about ECS ? 
+	1. A container orchestration service which supports Docker and Windows Containers.
+	2. Quickly deploy and scale containerized workloads without having to install, configure, manage and scale your own orchestration platform.
+	3. Similar to Kubernetes, BUT with deep integration with AWS services e.g. IAM, VPC, Route53
+----------------------
+Fargate Or EC2 ?
+	1. Cluster of Virtual Machines - ECS will run your containers on cluster of virtual machines.
+	2. Fargate for Serverless - Use Fargate for Serverless containers and you don't need to worry about the underlying EC2 instances!
+	3. EC2 For More Control - If you want to control the instalation, configuration and managementof your compute environment.
+---------------------
+Introducing Elastic Container Registry
+	ECR - Registry of container images
+	ECS - downloads images from ECR and deploys a docker container
+--------------------
+Cool services which use ECS
+	1. Amazon Segamaker - QUickly deploy and scale machine learning models for training and inference jobs
+	2. Amazon Lex - Uses deep learning to build conversational interfaces e.g. chatbots.
+	3. Amazon.com - Amazon's own recommendation engine is running on ECS
+======================
+Introduce to CloudFormation
+	Manage, configure, and provision your AWS infrastructureas code.
+	Resources are defined using a CloudFormation template.
+	CloudFormation interprets the template and makes the appropriate API calls to create the resources you have defined.
+	Supports YAML or JSON .
+-------------------
+CloudFormation Benefits:
+	Consistent - Infrastructure is provisioned consistently, with fewer mistakes
+	Quick and Efficient - Less time and effort than configuring things manually.
+	Version Control - You can version control and peer review your templates.
+	Free to use - Free to use but you are charged for the AWS resources you create using CF
+	Manage Updates - Can be used to manage updates and dependencies
+	Rolling Back - You can roll back to a previous state and delete the entire stack as well
+-------------------
+CF Process:
+	1. Yaml or JSON Template - Yaml or JSON template used to describe the end state of the infrastructure you are either provisioning or changing
+	2. S3 - After creating the template, you upload it to CF using S3.
+	3. API Calls - CF reads and makes the API calls on your behalf
+	4. CF Stachk - The resulting set of resources that CF builds from ypur template is called a "stack"
+------------------
+examples CF : https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/CHAP_TemplateQuickRef.html
+1. The Resources Section is Mandatory - Resources is the only mandatory section of the CF template
+2. The Transform Section is for Referencing Additional Code - The Transform section is used to reference additional code stored in S3, allowed for code re-use.
+	E.g. Lambda code or template snippets/reusable pieces of CF code.
+------------------
+Exam tips
+	1. Infrastructure as a code - CF allows you to manage, configure, and provision AWS infrastructure as YAML or JSON code
+	2. Parameters - Input custon values.
+	3. Conditions - E.g. provision resources based on environment.
+	4. Resources - This section is mandatory and describes the AWS resources that CF will create.
+	5. Mappings - Allows you to create custom mappings like Resion : AMI
+	6. Transform - Allows you to reference code location in S3, e.g. Lambda code or reusable snippets of CF code.
+====================
+DEMO - Provisioning AWS resources using CF
+	1. Create and Download an SSH Key Pair - Use this later to log in to an EC2 instance.
+	2. Create a CF Stack - Use the provided template to provision an EC2 instance with SSH access enabled.
+	3. Review Our CF Stack - identify the new instamce in the AWS console, and test that we can log in using SSH and the key pair we created at the beginning
+===================
+Exporting CF Stack Values:
+  Example Scenario 
+  Example Template : Export Values
+  Example Template : Import Values
+  Demo
+  Exam Tips
+-------------------
+CF Stack : MetworkStack
+vpc {
+  publicSubnet {
+    EC2
+  }
+  SG 
+  Network ACL
+  RouteTable 
+  InternetGW
+}
+
+Outputs : 
+	export : SubnetID
+	export: SecurityGroupID
+
+WebServerStack will get Ouputs as input
+-------------------
+1. Create new Stack  - Named NetworkStack
+2. Outputs - Export SubnetId and SecurityGroupID
+3. Create Another Stack - Use Fn::ImportValue to import the SubnetID and SecurityGroupID from NetworkStack
+==================
+Cloud Formation and SAM (Serverless Aplication Model)
+	1. SAM - extension of CloudFormation for Serverless - The SAM is an extension to CF used to define Serverless applications.
+	2. Simplified Syntax - SAM uses a simplified syntax for defining serverless resources: APIs, Lambda functions, DynamoDB tables, etc
+	3. SAM CLI - Use the SAM CLI to package your deployment code, upload it to S3, and deploy your Serverless applications.
+-----------------
+Commands : 
+	sam package --template-file ./mytemp.yml --output-template sam-template.yml --s3-bucket s3-bucket-name
+	sam deploy  --template-file sam-template.yml --stack-name mystack --capabilities CAPABILITY_IAM
+---------
+SAM DEMO:
+	1. Use the AWS CloudShell (SAM is pre-installed)
+	2. Create an S3 bucket
+	3. Use sam package to package our code and save it to S3
+	4. Use sam deploy to deploy a lambda function using CF
+-----------------
+CloudFormation Nested Stack
+	'Enable re-use of CF code for common use cases'
+	E.g. standard configuration for a load balancer, web server, or application server.
+	Instead of copying out the code each time, create a standard template for each common use case and reference from within your CloudFormation template.
+-----------------
+Exam Tips : 
+	Code re-use - Allows you to re-use your CF codeso you don't need to copy/past every time.
+	Common Use Case - Really useful for frequently used configurations, e.g. load balancers, web or application servers.
+	Stack Resource Type - Reference it in the Resources section of any CF template using the Stack resource type.
+================
+Introducing the CLoud Development Kit (CDK)
+	what is the CDK ?
+	How does it work ?
+	CDK terminology
+	Example code : TypeScript
+	The Process
+	Exam Tips
+----------------
+What is CDK ?
+	Open-source software development framework
+		Allows you to build applications, define, and 'deploy AWS resources' using a 'programming language' of your choice (ts, Py, Java, .NET, Go)
+----------------
+Terminology:
+	App: Container for one or more stacks
+	Stack : Unit of deployment
+	Construct : defines the AWS resources
+	
+	CDK Toolkit (also known as the CDK CLI).
+	The toolkit used to create and deploy using the CDK
+----------------
+The Process :
+	cdk init - Create a new CDK Project : run 'cdk init' inside an empty directory
+	npm run build - Compile the app : Use 'npm run build' to complete the app.
+	cdk synth - Synthesize : Use 'cdk synth' to create a CF template
+	cdk deploy - Deploy the Stack : use 'cdk deploy' to deploy the stack using CF
+---------------
+Introducing the CDK Exam Tips
+	1. Deploy - Applications and AWS Resources - Use a 'programming language' of your choice
+	2. Define - Apps, Stacks, Constructs - App=>Stack=>Construct
+	3. Synthesize - CF Template - use the CDK CLI to create a 'CF Template' from your code and deploy it.
+---------------
+Introducing Amplify - A set of tools and services designed to make it easy to develop web and mobile applicatins on AWS
+1. Frontend Developers - quickly and easily create 'full-stack' web and mobile apps using AWS
+2. Build Apps - Configure a 'stable and reliable backend' to support applications
+3. Suite of Tools - Client libs and CLI Console that provides 'continuous development' and 'hosting' of apps
+---------------
+Advantages of Using Amplify 
+	1. Frontend DEveloper Can 'focus on developing the web frontend' of the application
+	2. Amplify - Takes care of 'creating a reliable backend' (e.g. implementing authentication, storage, Lambda functions, and more)
+	3. Integrated - 'Amplify libraries integrate' your app with services like Cognito, S3, Lambda, and API GW
+---------------
+Amplify Hosting and Amplify Studio
+
+Amplify Hosting:
+	Fully managed web hosting service.
+	Web apps and static website hosting
+	CI/CD functionality.
+	Integrates with your code repo (git, Bitbucket, CodeCOmmit)
+ 
+Amplify Studio:	
+	Simple visual interface, separate from the AWS Management Console.
+	Create your frontend UI.
+	Configure and maintain your application backend.
+	Add feature like authentication, integration with data services. and serverless functions.
+----------------
+
+
+
+
+	
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	 
+
+
+
+	
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+	
+
+	
+		
+ 
+
+
+ 
+
+	
+	
+
+
+
+	
+
+
+
+	
+
+
+
+
+
+

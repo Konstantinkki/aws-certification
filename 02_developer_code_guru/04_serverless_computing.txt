@@ -1,0 +1,659 @@
+What is Serverless ?
+	Serverless allows you to run your application code in the cloud without having to worry about managing any servers
+	AWS handles the infrastructure management tasks so that you can focus on writing code.
+
+------------------------------------
+AWS Handles the Management Tasks
+	Capacity Provisioning
+	Patching 
+	Auto Acaling
+	High Availability
+------------------------------------
+Competitive Advantage
+	Speed to Market - By eliminating the overhead of managing servers, you can release code quickly and get your application to market faster
+	Super Scalable - You can have a million users on your website and everything will scale automatically
+	Lower Costs - You never pay for over-provisioning. Serverless applications are event-driving and you are only charged when your code is executed.
+	Focus on your application - AWS offers a range of serverless technologies which integrate seamlessly. Allowing you to focus on building great App's
+-------------------------------------
+Serverless technologies
+	Lambda - run code as function with no servers
+	SQS - allows you to scale and decouple your app's
+	SNS - sending text messages, mobile notifications and e-mails
+	API GW - create publish and secure APIs at any scale
+	DynamoDB Filly managed NoSQL database
+	S3 - Object storage and web hosting
+------------------------------------
+Exam tips
+	Serverless - Enables you ti build scalable applications quickly without managing any servers
+	Low Cost - serverless applications are event-driven and you are only charged when your code is executed
+	AWS Handles the Heavy Lifting - You can focus on writing code and building your application instead of configuring servers
+====================================
+What is Lambda? 
+	Serverless Compute - Run your code in AWS without provisioning any servers. Lambda takes care of everything required to run your code, 
+				including the runtime environment.
+	Supported Languages - Java, Go, PowerShell, Node.js, C#, Python and Ruby. Upload you code to Lambda and you are good to go!
+	Enterprise Features - Auto-scaling and high availability are already backed-in to the Lambda service.
+------------------------------------
+Lambda Pricing
+	You are charged based based the number of requests, their duration, and the amount of memory used by Lambda function
+	1. Requests - The first 1 million requests per month are free. $0.20 per month per 1 million requests
+	2. Duration - you are charged in 1 millisecond increments. The price depends on the amount of memory you allocated to your lambda function
+	3. Price per GB-second. A function that uses 512MB and runs for 100ms. 0.5GB x 0.1s = 0.05GB-seconds = $0.0000000083 
+		The first 400,000GB-sec/month are free
+-----------------------------------
+Event-driven Architecture
+	1. Event-driven - Lambda functions can be automatically triggered by other AWS services or called directly from any web or mobile app.
+	2. Triggered by event  - These events could be changes made to data in an S3 bucket, or DynamoDB table.
+	3. Triggered by User Requests - You can use API GW to configure an HTTP endpoint allowing you to trigger your function at any time using an HTTP request.
+-----------------------------------
+AWS Services that can envoke Lambda functions
+	DynamoDB
+	Kinesis
+	SQS
+	SNS
+	ALB
+	API GW
+	Alexa
+	CloudFront
+	S3
+	SES
+	CloudFormation
+	CloudWatch
+	CodeCommit
+	CodePipeline
+-----------------------------------
+Exam Tips
+	Extremely Cost Effective - Pay only when your code executes
+	Continuous Scaling - Lambda scales automatically
+	Event-Driven - Lambda functions are triggered by an event or action
+	Independent - Lambda functions are independent. Each event will trigger a single 1function.
+	Serverless Technology - Lambda, API GW, DynamoDB, S3, SNS, SQS.
+	Lambda Triggers - Be aware of the services that can trigger a lambdafunction
+===================================
+What is API Gateway ?
+	1. Publish, Mointain and Monitor APIs - API Gateway is a service which allows you to publish, maintain, monitor and secure APIs at any scale.
+	2. A Front Door - An API is like a front door for applications to access data, business logic, or functionality from your backend services, 
+		e.g. applications running on EC2, Lambda
+	3. Supported API Types 
+		'Restful APIs' - are optimized for stateless, serverless, workloads	
+		'WebSocket APIs' - are for real-time, two-way, statefull communication e.g. chat apps.
+------------------------------------
+Restfull APIs 
+	1. Representional State Transfer
+	2. Optimized for serverless and web applications
+	3. Stateless
+
+Supports JSON
+	1. JavaScript Object Notation
+	2. A notation language that uses key-value pairs
+
+API Gateway provides a single endpoint for all traffic interacting with the backend of your application
+API GW gets user request and decide where the request will be redirrected (Lambda, EC2, DynamoDB, Kinesis, Beanstalk ...)
+Supports Multiple Endpoinys and Targets - send each API endpoint to a different target
+Supports multiple versions - allows you to maitain multiple versions of your API, 
+				so you can have different versions of your deployment, testing and production environments
+------------------------------------
+API GW :
+	Serverless - Cost effective and scalable
+	CloudWatch - API GW logs API cals, latencies, and error rates to CLoudWatch
+	Throttling -API Gateway helps you manage traffic with throttling so that backend operations can withstand traffic spikes and denial of service attacks
+------------------------------------
+Exam Tips
+	API GW - like front door to app, provides an endpoint to my app
+	Serverless - Low cost and scales automatically
+	Throttling - You can throttle API GW to prevent your app from being overloaded by too many requests
+	CloudWatch - Everything is logged to CloudWatch. For example API calls, latencies and errors.
+===================================
+Version control with Lambda
+	Multiple Versions - You can create multiple versions of your  function code and use aliases to reference the version you want to use
+	Use Cases - Ina development environment, you might want to maintain a few versions of the same function
+	Alias - An alias points to a specific version of the function code
+-------------------------------------
+Lambda ALiases
+	if you upload some new code to lambda, the new code becomes the $LATEST version
+	If your application uses an alias, remember to upload the ARN that you are using if you want to use the new code
+----------------------------------
+Exam Tips 
+	$LATEST - is always the latest version of code you uploaded to Lambda
+	Versioning and Aliases - Use Lambda versioning and aliases to point your applications to a specific version if you don't want to use $LATEST
+	Update Your Aliases - if your app uses an alias instead of $LATEST, remember that it will not  automatically use the new code when you upload it.
+	Example ARN
+	  arn:aws:lambda:us-east-1:123456789012:function:mylambda:Prod
+          arn:aws:lambda:us-east-1:123456789012:function:mylambda:$LATEST
+==================================
+Lambda Concurent Exacution
+	Not necessary to memorize lots of limits for the exam
+	Be aware that there is a concurent execution limit for Lambda
+	Safety feature to limit the number of concurent executions across all functions in a given region per account
+
+	default  is 1000 per region
+	TooManyRequestsException
+	Http Status Code - 429
+	Request throughput limit exceeded
+---------------------------------
+Exam tips
+	Know that a limit exists - 1000 concurent executions per second
+	If you are running a serverless website like ACG, it's likely you will hit the limit at some point
+	If you hit the limit you will start to see invocations being rejected - 429 HTTP status code
+	The remedy is to get the limit raised by AWS support
+	Reserved concurency guarantees a set number of concurent executions are always available to a critical function
+=================================
+Lambda and VPC access
+	Resources in a Private VPC
+	Lambda needs the ability to interact with these resources.
+	Example : read or write to an RDS DB
+	Shut down an EC2 instance in response to a security alert
+	To Enable this, you need to allow the function to connect to the private subnet
+---------------------------------
+VPC COnfiguretion Info for connect lambda 
+	VPC - Specify the VPC that your function needs to access
+	Subnets - Select the subnets that Lambda will use
+	Security Groups - Choose the security groups that enable the required access. 
+--------------------------------
+Exam Tips
+	Enable Lambda to Access VPC Resources - it is possible to enable Lambda to access resources that are inside a private VPC
+	VPC Config Information - VPC ID, private subnet ID, security group ID
+	Network Access - Lambda creates ENIs using IPs from the private subnets.
+			The security group allows your function to access the resources in the VPC
+=================================
+Example Serverless Architectures
+	Characteristics of Event-Driven Architecture
+	Banking App
+	Image Processing
+	Processing Streaming Data
+	Exam Tips
+-----------------------------------
+Characteristics of Event Driven Architecture
+	Asynchronous - Events and async communications used to loosely couple app components. An event or message might trigger an action, 
+			but no responce is expected or required
+	Loosely Coupled - Services and components operate and scale independently of each other
+	Single-Purpose Function - Stateless functions performing a short-lived task.
+
+	AWS Services - used as building vlocks for applications
+	Minimal Maintenance - Many AWS services provide inherent scalability, performance, and reliability
+	Best Practice - avoid writing extra code to do something that AWS already offers as a service
+
+	Event Source --------> Event Router ----------> Event Destination
+	S3, Dynamo DB          Event Bridge              SNS, Lambda
+-----------------------------------
+Banking App Example Architecture
+
+                                                               ------>Overdraft Increase(Lambda) ---> SQS
+API GW----> Withdrawal(Lambda) ---->DynamoDB------->EventBridge
+                                                               ------> Overdraft Notification (Lambda) ---> SNS
+-----------------------------------
+Image Processing Example Architecture
+
+                                                       ----->DynamoDB
+Upload Image (S3) ------>Image Procxessing (Lambda)----
+                                                       ----->ProcessedImages(S3) <----CloudFront
+-----------------------------------
+SocialMedia Events ---->Kinesis Firehose------->Data Processor(Lambda)----->DynamoDB
+-----------------------------------
+Exam Tips
+	Event Driven and Asynchronous - An event or message might trigger an action, but no response is expected or required.
+	Building Blocks - Thank of AWS sedvices as building blockes that can be integrated together to create an application
+	Loosely Coupled - SQS allows you to queue messages. EventBridge helps you handle events and route them to application components
+	Flexibility and Scalability - Services and components operate and scale independently of each other.
+====================================
+Step Functions
+	Provides a visual interface for serverless applications, which enables you to build, and run serverless applications as a series of steps.
+	Each step in your application executes in order, as defined by your business logic.
+	The output of one stem may act as an input to the next
+-------------------------------------
+Manage the logic of your application.
+	Including sequencing, error handling, and retry logic, so your app executes in order, and as expected
+	Step Functions also log the state of each step, so when things do go wrong, you can diagnose and debug problems quickly
+
+	Task - one function
+	State machine - all tasks
+-------------------------------------
+Step Function Exam Tips
+	Visualize - Great way to visualize your serverless application
+	Automate - Automatically trigger and track each step. the output of one step is often the input to the next
+	Logging - log the state of each step, so if something goes wrong you can track what went wrong, and where
+====================================
+Comparing Step Functions Workflows	
+	Step function Workflows
+	Standard Workflows
+	Express Workflows
+	Synchronous and Asynchronous Express Workflows
+	Exam Tips
+-----------------------------------
+AStep function Workflows
+  Step Functions provides various types of state machine that feature different  workflows to cater to a variety of tasks that you would like to orchestrate
+  The kind of tasks you are orchestrating determine the type of workflow you should use.
+-----------------------------------
+Standard Workflows
+	Long-Running - Long-running, durable and auditable workflows that may run for up to a year. 
+			Full execution history available for up to 90 days after completion
+	At-Most-Once Model - Tasks are never executed more than once unless you explicity specify retry actions
+	Non-Idempotent Actions - When processing payments, you only want a payment to be processed once, not multiple times.
+	Change in State ? - A request is non-idempotent if it always causes a change in state (e.g. sending the same email multiple times 
+				causes a change in state because you and up with multiple emails in your inbox)
+----------------------------------
+Express Workflows
+	Short-lived - up to 5 minutes - Great for high volume, event processing type workloads.
+	At least once - model - Ideal if there is a possibility that an execution might be run more than once or you require multiple concurent executions
+	Idempotent - actions - For example transforming input data and storing the result in DynamoDB
+	Identical request - has no side effect - A Request considered idempotent if an identical request can be made onceor several times ina raw with 
+				no additional side effect (e.g. reading data from a database or S3 bucket)
+---------------------------------
+2 Types of Express Workflows (synchronous and asynchronous)
+	1. Syncgronous - begin task, wair for result, return the result - great for operations that are performed one at a time.
+			The workflow must complete before the next stepbegins.
+	2. Asynchronous - begins task, confirm the workflow has started, The result of the workflow can be found in CLoudWatch Logs.
+		Great if service or operations don't depend on the completion and result of your workflow
+---------------------------------
+Exam Tips:
+	Standard workflows - Long running (up to 1 year). At-most-once. Non-idempotent
+	Express Workflows - Short-lived (up to 5 minutes). At-least-once. Idempotent
+	Synchronous Express Workflows - The workflow must complete before the next step begins (e.g. confirm successfull payment before sending an order)
+	Asynchronous Express Workflows - Other tasks are not dependent on the completion of the workflows (e.g. a messaging system) 
+=================================
+Understanding Ephemeral and Persistent Data Storage Patterns
+	Lambda is Stateless
+	Lambda Data Storage Options
+	/tmp
+	Storing Lambda Libraries
+	Lambda Layers
+	S3
+	EFS (Elasric File System)
+	Exam tips
+---------------------------------
+Lambda is stateless
+	Stateless - Functions are stateless, meaning that you can't permanently store any data in the function (e.g. session data, customer data, etc.)
+	Ephemeral - Not used for applications that need to run for a longer than 15 minutes(e.g. a db application or a web server that needs to stay up and running)
+	Persisting Data - To persist data, the function must interact with a data store(e.g. save it to S3, EFS, or dynamodb)
+---------------------------------
+Lambda Data Storage Options 
+	There are a few different options for storing data. Understand the differences and when to use each.
+	1. Native with Lambda: /tmp, Lambda layers
+	2. External Storage options: S3, EFS, etc.
+----------------
+/tmp 
+	1. Temporary storage - provided in the execution environment of the Lambda function, By default, 512MB, configurable up to 10 GB
+	2. Like a cached file system - Data can be accessed by multiple invocations of your function sharing the execution environment in order to optimize performance
+	3. Data is not Persistent - Available for the lifetime of the iexecution environment. Not a place to store permanent data.
+----------------
+Storing Lambda Libs
+	Additional libs needed by the function can be included in your Lambda deployment package (the Zip file containing your code)
+	
+	This increases your deployment package size
+----------------
+Lambda Layers
+	Best Practice - Add libraries and SDKs as a layer that can be references  by multiple functions.
+	Large Dependencies - Import image manipulation libs, graphic libs, or a particular version of the AWS SDK
+	Better Performance - Deployment will be faster because the zip file containing your code is smaller
+    However, if you want to change the version of a lib included, you can't update it dynamically. You need to create a new layer and reference that from func.
+----------------
+Persistent Lambda Storage with S3
+	Object Storage only - Allows you to store and retrive objects. Not a file system.
+	Cannot Append Data - Cannot directly open and write  data to objects stored in S3
+	Upload a new version - If you wand to change the data, you need to upload a completelly new object.
+---------------
+Persistent Lambda Storage with EFS
+	Shared file system - Acts like a file system, data is persistent, and can be dynamically uploaded(e.g. ypu can open a file and write to it)
+	Mounted - Mounted by the function when the execution environment is created. Can be shared across invocations.
+	VPC - To use EFS, your Lambda function must be in the same VPC as your EFS file system
+--------------
+Exam Tips
+			    Native within Lambda				External Storage Options
+			/tmp		    	Lambda Layer 			S3				EFS
+Use Case : 		temporary data          Libs and SDKs			Persistent Data			Persistent Data	
+Size Limit:		512MB - 10GB	    	50MB-zip. 250MB-Unzip		Elastic				Elastic
+Dynamic Update:		Dynamic R/W	    	Update require a new layer	store and retrive		Dyanmic RW
+Shared:			Shared with exec env.   Shared across exec, envs	Shared across exec. env.	Shared across exec. envs.
+=========================================
+Lambda Env. Variables and Parameters
+	What are Env Variables
+	Example use cases
+	Other Lambda Configurable Params	
+	Exam Tips
+----------------
+Lambda Env. VAriables - Adjust your fucntion's behavior, without changing your code
+Configure - Pass different env variables to configure your function to behave differently in your development env than it does in production.
+Key-Value Pairs - A pair of strings: a key and a value (e.g. key: environment, value: development)
+Defined before your version is published.- LOCKED WHEN THE VERSION IS PUBLISHED.
+----------------
+Example Use Cases
+Reference S3 Resources - key:BUCKET, value: my-bucket
+Reference an SNS Topic - key:SNSTOPIC, value:my-topic
+Reference a DynamoDB Table
+---------------
+Other Lambda Configurable Parameters
+    General Configuration
+	Memory 
+	Ephemeral storage
+	Function timeout
+    Triggers
+	The service or resource that is able to invoke your function.
+    Permissions
+	The function's execution role determines the permissions that the function will have
+    Function URL
+	An HTTP(S) endpoint used to access your function using a browser
+    Tags 
+	User-defined key-value pairs that help organize your functions (e.g. for cost reporting).
+    VPC 
+	Allow your function to access resources that are in a custom VPC(e.g. a private VPC)
+--------------------
+Other Lambda Configurable Parameters
+	Monitoring and Operational tools
+		CloudWatch, CloudWatch Logs, X-Ray (performance issue)
+	Concurency
+		Reserverd concurency ensures that a critical fucntion can always run and restricts other concurent requirements.
+		Provisioned concurency lets your fucntion scale consistently without any functions in latency 
+--------------------
+Exam Tips:
+	Lambda Env. Variables
+		Adjust your function's behavior, without changing your code.
+		key:environment, Value: dev
+	Configurable Parameters
+		Allow you to adjust various settings that apply to your function. Located in the Configuration tab.
+	Connectivity
+		Connect to other AWS services like CloudWatch and X-Ray for monitoring, VPCs, and EFS file systems.
+======================
+cHandling Lambda Event Lifecycle and errors
+	Invocation Lifecycle
+	Lambda Retries
+	Dead-letter Queues
+	Lambda Destinations
+	Exam Tips
+------------------
+Lambda Invocations - when invoke a function, you can invoke it synchronously or asynchronously
+	Synchronous Invocation
+	   Lambda runs the function, waits for a response, 
+	   The service calling the function will know if the function completed successfully or not
+	    Example : API GW invoking a function and returning an error code to the caller
+	
+	Asynchronous Invocation
+	    No Acknowledgement to let you know thatthe invocation has successfully processed.
+	    The Service calling the function 'is not notified' if the function failled to complete successfully.
+	    Example :  S3 invoking a function when an object is created.
+-----------------
+Lambda retries
+	Default - if a function returns an error, Lambda automatically performs 'two retries'
+	Common Errors - Something went wrong in the 'function code' or the function 'timed out' before processing completed.
+	Retry Approach - Lambda waits 'one minute' before the first retry. If that fails, it will wait 'two minutes' before the second retry.
+-----------------
+Dead-Leter Queues (DLQs)
+	Save Failed Invocations for further processing.
+	Associate with a particular version of a function.
+	Can be an 'event source' for a function, allowing you to re-process events.
+	Handles failures only
+----------------
+SQS - Holds 'failed events' in the queue until they are retrived
+SNS - Sends notifications about failed events to one or 'multiple destinations'
+----------------
+Lambda destinations - Optionally, configure Lambda to send invocation records to another service.
+	Invocation Success - Send a record to 'one destination' when the invocation was 'successfully' processed.
+	Invocation Failure - Send a record to 'another destination' when the invocation and all retry attempts have 'failed'
+----------------
+Handling Lambda Event Lifecycle and Errorts - Exam Tips
+	Retries - if error tryes to retry
+	Dead-Letter Queues - for send dead leter queue
+	Lambda Destination - for send successfull invocations
+=================
+Kambda Deployment PAckaging Options
+	Lambda Deployment Package
+	Deployment packages Greater tham 50MB
+	Lambda Layers
+	Exam Tips
+------------------
+Lambda Deployment PAckage - used to Deploy Your Code to Lambda
+	Console - When creating a function using the console, a zip file containing the code you provide is automatically created by Lambda
+	.zip File Archive - This .zip file is your 'deployment package'. Containing App Code, Dependencies (optional)
+	Deployment Package - You can also 'create' the deployment package yourself and 'upload' directly from your local machine up to 50MB
+-----------------
+Deployment PAckages Greater tham 50MB
+	Upload the .zip file to S3 in the Region where you would like to create your function.
+	Specify the S3 object when you create your function.
+	Direct upload from your local machine is not supported for deployment packages over 50 MB in size.
+-----------------
+Lambda Layers 
+   Distribution Mechanism - a zip file archive that can be referenced by your function containing 'function dependencies', like 'libraries', custom runtimes. etc
+   Shared - once created, a layer can be used by 'multiple functions' that have the same dependencies.
+   Best Practice - Reduces the size of your 'deployment package' enabling your function to 'initialize faster'.
+-----------------
+Lambda Deployment Packeging Options - Exam Tips
+	Deployment Package - your function 'code'. 'Optional' dependencies
+	Large Deployment Packages - Deployment packages over 50MB in size must be zipped and uploaded to S3.
+	Lambda Layer - Reduces the size of the deployment package, enabling functions to 'initialize faster'. Multiple functions can reference the same layer.
+=================                                                         
+Lambda Performance Tuning Best Practices
+	Memory and CPU Capacity
+	The Execution Environment
+	Optimizing Static Initialization
+	Exam Tips
+----------------
+Memory and CPU Capacity
+	Control CPU capacity by configuring function memory.
+	From 128 MB (suitable for very basic functions) up to 10240 MB
+
+	Function that import libraries and interact with data loaded from other services 'need more' than 128MB
+	Adding memory will 'improve performance' if the function is either memory or CPU bound
+	Adding memory may also 'reduce the duration' that the function runs for.
+----------------
+The Execution Environment steps : 
+	Download Code - The first time your function is invoked, Lambda creates the execution environment.
+	Configure - Configuration Memory, runtime(e.g. Node.js), Configuration
+	Static Initialization - Adds Latency - Runs function static initialization code; import libraries and dependencies.
+	Function Code - Executes Function Runs the function code.
+----------------
+Optimizing Static Initialization
+	Three Factors That Contribute to Latency
+		Code - The amount of code that needs to run during the initialization phase
+		Function Package Size - Including imported libs, dependencies, and Lambda layers
+		Performance - Libs and other services that require connections to be set up (e.g. connections to S3 or a DB)
+---------------
+Exam Tips
+	Memory and CPU - increasing the memory will increase CPU capacity and can reduce the duration.
+	Dependencies - Importing libraries and SDKs take time and can slow down the initialization of your function
+	Only What You need - Only import what you need in order to avoid wasting time importing an entire SDK.
+
+imprt AWS from "aws-sdk"
+import DynamoDB from "aws-sdk/clients/dynamodb"
+====================
+Advanced API Gateway
+	Importing APIs into API GW
+	1. Importing API definition Files - You can use the api Gateway Import API featuresto import an API using a definition file
+	2. Supported protocols - OpenAPI, formerly known as Swagger, is supported
+	2. Create new and update Existing APIs - you can use an OpenAPI definition file to create a new API or update an axisting API
+-------------------
+	Legacy protocols
+	1.For example, SOAP (Simple Object Access Protocol) which returns a response in XML format instead of JSON, is a legacy protocol
+	you can configure API GW as a SOAP web service passthrough
+	2. You can also use API GW transform the XML response to JSON
+===================
+Using API GW Mock Endpoints for Integration testing and resolving integration dependencies
+	API GW Mock endpoints
+	Use Case
+	Example API GW Responses
+	Exam Tips
+-------------------
+API GW Mock endpoints
+	Allows developers to create, test and debug software.
+	Mimics the responces and behaviors of a real API.
+	Allows you to simulate the 'responces and behaviors' that you would expect from the real API.
+	Also described as a 'mock integration'
+-------------------
+API GW Response 
+	1. you define the response
+	2. Status code and message
+	3. Forms the mock integration response
+{
+"statusCode": 200,
+"message": "Go ahead without me."
+}
+===================
+Using API GW Stages for Testing Deployed code
+	What is API GW Stage
+	Stage Variables
+	Example
+	Exam Tips
+--------------------
+Waht is an API Gateway Stage?
+	1. A Logical reference - References the lifecycle state of the API (e.g. dev, prod, v3,  etc)
+	2. Identified - Each stage can be associated with a different endpoint (e.g. dev, prod, or test env)
+	3. Invoke URL - Each stage has a unique invoke URL:
+		https://sjdhsdh.exec-api.us-east-1.amazonaws.com/dev
+-------------------
+Stage Variables 
+	'key-value pairs' that act like env variables.
+	Change the 'behavior of your API' according to the value of the variable.
+	We can use a stage variable to configure the 'endpoint'  that a stage is going to route HTTP requests to.
+===================
+Creating a dynamic Lambda Deployments Using API Gateway Staging Variables ExamTips
+	Dynamic Deployment - We can use API Gateway stages and stage variables to create 'dynamic deployments' 
+	Reference Different Functions - We can use 'stages' and 'staging variables' to  'reference dufferent backends'(e.g. different Labmda functions)
+	Deploy and Test Safely - we can 'deploy and test' new functionality safely before deploying to production.
+===================
+API Response and Request Transformation
+	API Request Transformations
+	API Response Transformations
+	Parameter Mapping
+	Examples
+	Exam Tips
+------------------
+Parameters Mapping
+	HTTP APIs - Patameter mapping is used to 'modify' API requests and responses
+	Specify - API 'request' or 'response' parameters that ypu want to modify
+	How - Specify how you waant to 'change' the parameters.
+--------------------
+API Request Transformations:
+	Header
+	Query string
+	Request path
+------------------
+API Response Transformations
+	header
+	status code
+------------------
+Exam Tips
+	Tramsform - API Gateway can transform HTTP requests and responses using  'parameter mapping'
+	Request Transformations - Change the header, query string or request path of an API 'request'
+	Response Transformations - Change the header or status code of an API 'response'
+==================
+API GW Caching & Throttling
+  Caching :
+	Caches Your Endpoints Response - This reduces the number of calls to your endpointand can also improve the latency for requests to your API
+	TTL - when you enable caching, API GW caches responces from your endpoint for a specified TTL period, in sec. The default is 300 seconds
+	API GW Returns the Cached Response - API GW then responds to new requests by looking up the response from the cache, instead of making a new request to your app
+-----------------
+The purpose of API GW throttling is to prevent your API from being overhelmed by too many requests.
+	default limits - By Default API GW limits the steady-state request rate to 10 000 requests /sec per region
+	Concurent Requests - The max concurent requests is 5000 requests across all APIs per Region. You can request an increase on these limits.
+	429 Error - If you exceed 10 000 requests per second, or 5000 concurent requests, you will receive a '429 Too Many Requests' error message.
+-----------------
+What Is X-Ray?
+	X-Ray is a tool which helps developers analyze and debug distributed applications.
+	Allowing you to troubleshoot the root cause of performence issues and errors.
+	Provides a visualization of your application's underlying components.
+-----------------
+X-Ray Integrations
+	AWS Services - You can use X-Ray with EC2, Elastic Container Service, Lambda, EBS, SNS, SQS, DynamoDB, ELB, API GW
+	Integrate with Your Apps - You can use X-Ray with applications written in  Java, Node.jsm .NET, GO, Ruby, Python
+	API Calls - The X-Ray SDK automatically captures metadata for API calls made to AWS services uso=ing the AWS SDK
+-----------------           
+X-Ray on my APP
+	1. Install The X-Ray Agent - Install the agent on your EC2 instance
+	2. Configure - Instrument your application using the X-Ray SDK
+	3. The X-Ray SDK - gathers info from request and response headers, the code in your app, and metadata about the AWS resources on which it runs, and 
+			sends this trace data to X-Ray e.g. incoming HTTP requests, error codes, latency data
+----------------
+X-Ray Configuration :
+	X-Ray SDK
+	X-Ray daemon
+   You use the SDK to instrument your app to send the required data e.g. data about incoming and outgoing HTTP requests that are being made to your Java app.
+----------------
+Install daemon
+	On-Premises and EC2 instances - Install teh X-Ray daemon on your EC2 instance or on-permises server
+	Elastic BeasTalk - install the X-Ray daemon on the EC2 instances inside your Elastic Beanstalk env.
+	Elastic Container Service - Install the X-Ray daemon in its own Docker container on your ECS clusteralongside your app	
+----------------
+Exam Tips
+	High level Configuration Steps
+		You'll need three things:
+		1. X-Ray SDK
+		2. X-Ray daemon
+		3. Instrument your app using the SDK to send the required data to X-Ray e.g. data about incoming HTTP requests to your app.
+		If you want to also record app specific information in the form of key-value pairs, use annotations to add user defined key-value pairs
+		to your x-Ray data - allows you to filter, index, and search within X-Ray e.g. game_name=TicTacToem game_id=234234432
+================
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+	
+ 
+
+
+
+
+	 
+
+
+
+	
+	
+
+
+
+
+	
+
+	
+
+
+
+
+
+
+	
+
+
+
+
+
+                          
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

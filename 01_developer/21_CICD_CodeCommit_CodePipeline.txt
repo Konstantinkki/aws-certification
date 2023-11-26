@@ -1,0 +1,556 @@
+CICD Introduction
+	We have learned how to :
+		Create AWS Resources, manually (fundamentals)
+		Interact with AWS programmatically (AWS CLI) 
+		Deploy code to AWS using Elastic Beanstalk
+	All these manual steps make it very likely for us to do mistakes!
+	
+	We woild like our code "in a repository" and have it deployed onto AWS
+		Automatically 
+		The right way
+		Making sure it's tested before being deployed
+		With possibility to go into different stages (dev, test, staging, prod)
+		With manual approval where needed
+	To be a proper AWS developer... we need to learn AWS CICD
+----------------------------------------------------------------------------------------
+This section is all about automating the deployment we've done so far while adding increased safety
+
+We'll learn about: 
+	AWS CodeCommit - storing our code
+	AWS CodePipeline - automating our pipeline from code to Elastic Beanstalk
+	AWS CodeBuild - building and testing our code
+	AWS CodeDeploy - deployint the code to EC2 instances (not Elastic Beanstalk)
+	AWS CodeStar - manage software development activities in one place
+	AWS CodeArtifact - store, publish, and share software packages
+	AWS CodeGuru - automated code review using Machine Learning
+----------------------------------------------------------------------------------------
+Continuous Integration (CI)
+	Developers push the code to a code repository often (e.g., GitHub, CodeCommit, Bitbucket...)
+	A testing/build server checks the code as soon as it's pushed (CodeBuild, Jenkins CI, ...)
+	The developer gets  feedback about the tests and checks that have passed/failled
+
+	Find bugs early, then fix bugs
+	Deliver faster as the code is tested
+	Deploy often as the code is tested
+	Deploy often
+	HAppier  developers, as they're unblocked
+---------------------------------------------------------------------------------------
+Continupus Delivery (CD)
+	ensures that software can be released reliably whenever needed
+	Ensures deployments happen often and are quick
+	Shift away from "one release every 3 months" to "5 releases a day"
+	That ubually means automated deployment (e.g, CodeDeploy, Jenkins CD, Spinnaker, ...)
+	                                                                                                 --> app v1 server ---> app v2 Server
+	                                                                                                 |
+developer--code-->CodeRepository ---fetch code--->Build Server---deploy every build--->Deployment Server --> app v1 server ---> app v2 Server 
+                                                                                                         |
+                                                                                                         --> app v1 server ---> app v2 Server 
+
+---------------------------------------------------------------------------------------------------------------------------
+Technology Stack for CICD
+
+AWS CodeCommit			     AWS CodeBuild  					AWS Elastic BeansTalk
+
+code ---------------------------->Bulld---------->Test------------------------------->Deploy--------->Provision
+GitHub
+Bitbucket                     Jenkins				                  AWS CodeDeploy     EC2 Instances
+3rd party Code Repo           3rd pty CI Servers                                                     On-premises Instances
+                                                                                                     AWS Lambda
+                                                                                                     Amazon ECS
+|------------------------------------------------------\/-------------------------------------------------------------------|
+                                               orchestrate using:
+						AWS CodePipeline
+==================================================================================================================================
+AWS CodeCommit
+	Version control is teh ability to understand the various changes that happened to the code over time(and possibly roll back)
+	All these are enabled by using a version control system such as Git
+	A Git repository can be synchronized on your computer, but it usually is uploaded on a central online repository
+	Benefits are:
+		Collaborate with other developers
+		Make sure the code is backed-up somewhere
+		Make sure it's fully viewable and auditable
+-----------------------------------------------------------------------------------------------------------------------------------
+AWS CodeCommit 
+	Git repositories can be expensive
+	The induxtry includes GitHub, GitLab, Bitbucket, ...
+	And AWS CodeCommit:
+		Private Git repositories
+		No size limit on repositories (scale seamlessly)
+		Fully managed, highly available
+		Code only in AWS CLoud account => increased security and compliance
+		Security (encrypted, access control, ...)
+		Integrated with Jenkins, AWS COdeBuild, and other CI tools
+---------------------------------------------------------------------------------------------------------
+CodeCommit - Security
+	Interaction are done using Git  (Standard)
+	Authentication
+		SSH Keys - AWS Users can configure SSH keys in their IAM console
+		HRRPS - with AWS CLI Credential helper or Git Credentials for IAM user
+	Authorization
+		IAM policies to manage users/roles permissions or repositories 
+	Encryption
+		Repositories are automatically encrypted at rest using AWS KMS
+		Encrypted in transit (can only use HTTPS or SSH - both secure)
+	Cross-account Access
+		DO .NOT share your SSH keys or youe AWS credentials
+		Use an IAM role in your AWS account and use AWS STS (AssumeRole API)
+---------------------------------------------------------------------------------------------------------
+Code commit vs GitHub
+			  		Code Commmit			     GitHub
+support Code Review (Pull Requests)         +					+
+Integration with AWS CodeBuild		    +					+
+Authentication (SSH & HTTPS)		    +					+
+Security				IAM Users & Roles		GitHub Users
+Hosting					Managed and Hosted by AWS	hosted by GitHub    
+                                                                        GitHub Enterprise: self hosted on your server
+UI					Minimal				Full Featured
+===========================================================================================================
+AWS CodePipeline
+	Visual Workflow to orchestrate your CICD
+	Source - CodeCommit, ECR, S3, Bitbucket, GitHub
+	Build - CodeBuild, Jenkins, CLoudBees, TeamCity
+	Test - CodeBuild, AWS device Farm 3-rd party tool, ...
+	Deploy - CodeDeploy, Elastic Beanstalk, CloudFormation, ECS, S3 ...
+	Invoke - Lambda, Step Function
+	Consistes of stages:
+		Each stage have sequental actions add/or parallel actions
+		Example : Build ->Test->Deploy->Load Testing->...
+		Manual approvel can be defined at any stage
+----------------------------------------------------------------------------------------------------------
+CodePipeline - Artifacts
+	Each pipeline stage can create artifacts
+	Artifacts stored in an S3 bucket and posted on to the next stage
+	
+Developer ---push code---> CodeCommit ---output--->S3---from s3---> CodeBuild--->S3--->CodeDeploy--->deploy
+----------------------------------------------------------------------------------------------------------
+CodePipeline - troubleshooting
+	For CodePipeline Pipeline/Actions/Stage Execution State Changes
+	Use CloudWatch Events (Amazon EventBridge). Example:
+		You can create events for failed pipelines
+		You can create events for cancelled stages
+
+	If CodePipeline fails a stage, your pipeline stops, and you can get information in the console
+	If pipeline can't perform an action, make sure the "IAM Servide Role" attached does have enough IAM permissions (IAM Policy)
+	AWS CloudTrial can be used to audit AWS API calls
+=========================================================================================================
+CodePipeline - Events vs. Webhooks vs. Polling
+	Events (prefered way because immidetely)
+		CodeCommit --event--->Event Bridge---trigger--->Code Pipeline
+		GitHub ---> CodeStar Source Connect(GitHubApp)---trigger---> CodePipeline
+
+	Webhooks
+		Script ---HTTP Webhook---> CodePipeline
+
+	Polling(not good solution)
+		GitHub<---regular checks (time periodically)---CodePipeline
+---------------------------------------------------------------------------------------------------------
+CodePipeline - Action Types Constraints for Artifacts
+	Owner
+		AWS - for AWS services
+		3-rd party - GitHub or Alexa Skills Kit
+		Custom - Jenkins
+	Action Type
+		Source - S3, ECR, GitHub, ...
+		Build - CodeBuild, Jenkins
+		Test - CodeBuils, Device Farm, Jenkins
+		Approval - Manual
+		Invoke - Lambda, Step Function
+		Deploy - S3, CloudFormation, CodeDEploy, Elastic Beanstalk, OpsWorks, ECS, Service Catalog,...
+-------------------------------------------------------------------------------------------------------------
+CodePipeline - Manual Approval Stage
+	CodeCommit ---new commit--->CodeBuild---trigger--->Manual Approval---deploy ---> CodeDeploy
+	                                              (it triggers SNS--email---> IAM User)
+	Usar need permissions for approve:
+{
+"Version":"2012-20-12",
+"Statement":[
+{
+"Effect":"Allow",
+"Action":"codepipeline:GetPipeline*",
+"Resource":"arn:aws:codepipeline:us-east-1:123456789012:MyFirstPipeline"  
+},
+{
+"Effect":"Allow",
+"Action":"codepipeline:PutApprovalResult*",
+"Resource":"arn:aws:codepipeline:us-east-1:123456789012:MyFirstPipeline/MyApprovalStage/MyApprovalAction"
+}
+]
+}
+=============================================================================================================
+AWS CodeBuild
+	Source - CodeCommit, S3, Bitbucket, GitHub
+	Build instructions: Code filebuildspec.yml or insert manually in Console
+	Output logs can be stored in Amazon S3 & CloudWatch Logs
+	Use CloudWatch Metrics to monitor build statistics
+	Use EventBridge to detect failed builds and trigger notifications
+	Use CloudWatch Alarms to notify if you need "thresholds" for failures
+
+	Build Projects can be defined within CodePipelene or CodeBuild
+-------------------------------------------------------------------------------------------------------------
+CodeBuild - Supported Environments
+	Java
+	Ruby
+	Python 
+	Go
+	Node.js
+	Android
+	.Net Core
+	PHP
+	Docker - extend any environment you like
+--------------------------------------------------------------------------------------------------------------
+CodeBuild - How it Works
+
+CodeCommin(source)          ------------------->  CodeBuild  ----------------------artifacts---->S3 Bucket
+source code + buildspec.yml     --->   (Running instructions from buildspec.yml) |
+	                        |                 |  ^                           -------- store logs ---> Amazon S3, CloudWatch Logs
+	                        |                 |  |
+	           Docker Image |                 |  |
+	                                       S3 Bucket (cache)
+	                                          (optional)
+--------------------------------------------------------------------------------------------------------------
+CodeBuild - buildspec.yml
+	buildspec.yml file must be at the root of your code
+	env - define environment variables
+	   	variables - plaintext variables
+		parameter-store - variables stored in SSM Parameter Store
+		secrets-manager - variables stored in AWS Secrets Manager
+	phases - specify commands to run:
+		install - install dependencies you may need for your build
+		pre_build - final commands to execute before build
+		Build - actual build commands
+		post_build - finishing touches (e,g, zip output)
+	artifacts - what to upload to S3 (encrypted with KMS)
+	cache - files to cache (usually dependencies) to S3for future build speedup
+
+version: 0.2
+
+env: 
+    variables:
+	JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-amd64"
+    parameter-store:
+	LOGIN_PASSWORD: /CodeBuild/dockerLoginPassword
+phases:
+    install:
+	commands:
+	 - echo "Entered the install phase..."
+	 - apt-get update -y
+	 - apt-get install -y maven
+    pre_build:
+	commands:
+	 - echo "Entered the pre_build phase..."
+	 - docker login -u User -p $LOGIN_PASSWORD
+    build:
+	commands:
+	 - echo "Entered the build phase..."
+	 - echo "Build started on `date`"
+	 -mvn install
+    post_build:
+	commands:
+	 - echo "Entered the post_build phase..."
+	 - echo "Build completed on `date`"
+artifacts:
+    files:
+     - target/messageUtil-1.0.jar
+cache: 
+    paths:
+	- "/root/.m2/**/*"
+------------------------------------------------------------------------------------------------------------
+CodeBuild - Local Build
+	in case of need of deep troubleshooting beyond logs ...
+	You can run CodeBuild locally on your desktop (after installing Docker)
+	Fro this, leverage the CodeBuild Agent
+
+https://docs.aws.amazon.com/codebuild/latest/userguide/use-codebuild-agent.html
+------------------------------------------------------------------------------------------------------------
+CodeBuild - inside VPC
+	By default, your CodeBuild containers are launched outside your VPC
+		it cannot access resources ina VPC
+	You can specify a VPC configuration:
+		VPC ID
+		Subnet IDs
+		Security Group IDs
+	Then your build can access resources in your VPC (e.g. RDS, ElastiCache, EC2, ALB ...)
+	Use cases: integration tests, data query, internal load balancers, ...
+
+===========================================================================================================
+CodePipeline - CloudFormation Integration
+	CloudFormation is used to deploy complex infrastructure using an API
+		CREATE_UPDATE - create or update an existing stack
+		DELETE_ONLY - delete a stack if it exists
+
+Code Pipeline:                                                                                                          |
+                                                                                                                        |
+	Code Build ------> CloudFormation---------->Code Build---------->CLoudFormation------------->CloudFormation     | -->deploy to prod
+	(build app)     (deploy infra & app)        (Test app)           (Delete Test infra)         (Deploy Prod Infra)|    CREATE_UPDATE
+	                        |                        |                          |                                      |
+	                        |                        | HTTP test suite          | DELETE_ONLY
+		                |                        |                          |
+		                | CREATE_UPDATE                        CLoudFormation Stack
+		                |-------------------->
+		                                                       ALB---->ASG
+============================================================================================================
+AWS CodeDeploy
+	Deployment service that automates application deployment
+	Deploy new application version to EC2 Instances, On Permisses servers, Lambda functions, ECS Services
+	Automates Rollback capability in case of failed deployments, or trigger CloudWatch Alarm
+	Gradual deployment control
+	A file named appspec.yml defines how the deployment happens
+------------------------------------------------------------------------------------------------------------
+CodeDeploy - EC2/On-premises Platform
+	Can deploy to EC2 instances & on-premises servers 
+	Perform in-place deployments or blue/green deployments
+	Must Run the CodeDeploy Agent on the target instances
+	Define deployment speed 
+		AllAtOnce : most downtime
+		HalfAtATime : reduced capacity by 50% 
+		OneAtATime: slowest, lowest availability impact
+		Custom: define your %
+------------------------------------------------------------------------------------------------------------
+CodeDeploy - Blue-Green Deployment
+
+we have ALB --> + ASG (with 3 instances)
+	will be created same ASG with 3 instances
+	ALB will be pointed to new ASG
+------------------------------------------------------------------------------------------------------------
+CodeDeploy Agent 
+	The CodeDeploy Agent must be running on the EC2 instances as a pre-requisites
+	It can be installed and updated automatically if you're using Systems Manager
+	The EC2 instances must have sufficient permissions to access S3 to get deployment Bundles
+
+IAM Permissions:
+
+{
+"Vwersion":"2020-10-20",
+"Statement":[
+{
+"Action": [
+ "s3:Get*",
+ "s3:List*"
+],
+"Effect":"Allow",
+"Resource":"*"
+}
+]
+
+
+}
+---------------------------------------------------------------------------------------------------------------
+CodeDeploy  - LAmbda Platform
+	CodeDeploy can help you automate traffic shift for Lambda aliaces
+	Feature is integrated within the SAM framework
+	Linear : grow traffic every N minutes untill 100%
+		LambdaLinear10PercentEvery3Minutes
+		LambdaLinear10PercentEvery10Minutes
+	Canary: try X percent then 100%
+		LambdaCanary10Percent5Minutes
+		LambdaCanary10Percent30Minutes 
+	AllAtOnes: immediate
+--------------------------------------------------------------------------------------------------------------
+CodeDeploy - ECS Platform 
+	CodeDeploy can help you automate teh deployment of a new ECS Task Definition
+	Only Blue/Green Deployments
+	Linear: grow traffic every N minutes untill 100%
+                ECSLinear10PercentEvery3Minutes
+                ECSLinear10PercentEvery10Minutes
+        Canary: try X percent then 100%
+                ECSCanary10Percent5Minutes
+                ECSCanary10Percent30Minutes
+        AllAtOnes: immediate
+=============================================================================================================
+CodeDeploy - Deployment to EC2
+	define how to deploy the application using appspec.yml + Deployment Strategy
+	Will do In-place update to your fleet of EC2 instances
+	Can use hooks to verify the deployment after each deployment phase
+-------------------------------------------------------------------------------------------------------------
+CodeDeploy - Deploy to an ASH
+	Im-place Deployment
+		Updates existing EC2 instances
+		Newly created EC2 instances by an ASG will also get automated  deployment
+	Blue/green Deployment
+		A new Auto-Scaling Group is created (settings are copied)
+		Choose how long to keep the old EC2 instances (old ASG)
+		Must be using an ELB
+-----------------------------------------------------------------------------------------------------------
+CodeDeploy - Redeploy & Rollbacks
+	Rollback = redeploy  a previously deployed revision of your application
+	Deployments can be rolled back : 	
+		Automatically - rollback when a deployment fails or rollback when a CloudWatch Alarm thresholds are met
+		Manually
+	Disable Rollbacks - do not perform rollbacks for this deployment
+
+	If a roll back happens, CodeDeploy redeploys the last known good revision as a new deployment (not a restored version)
+===============================================================================================================
+CodeDeploy - Troubleshooting
+	Deployment Error: "InvalidSignatureException - Signature expired: [time] is now earlier than [time]"
+		For CodeDeploy to perform its operations, it requires accurate time references
+		If the date and time on your EC2 instance are not set correctly, then might not match the signature date of your deployment request, which CodeDeploy rejects
+	Check log file to understans deployment issues 
+		For Amazon Linux, Ubuntu, and RHEL log files stared at /opt/codedeploy-agent/deployment-root/deployment-logs/codedeploy-agent-deployments.log
+================================================================================================================
+AWS CodeStar
+	An integrated solution that groups: GitHub, CodeCommit, CodeBuild, CodeDeploy, CloudFormation, CloudPipeline, CloudWatch....
+	Quickly create "CICD-ready" projects for EC2, Lambda, Elastic Beanstalk
+	Supported languages: C#, Go, HTML5, Java, Node.js, PHP, Python , Ruby
+	Issue tracking integration- with Jira/GitHub Issues
+	Ability to integrate  with Cloud9 to obtain a web IDE (not all regions)
+	One dashboard to view all your components
+	Free service, pay only for the underlying usage of other services
+	Limited Customization
+================================================================================================================
+AWS CodeArtifact
+	Software packages depend on each other to be built (alse called code dependencies), and new ones are created 
+	Storing and retriving these dependencies is called artifact management
+	Traditionally you need to setup your own artifact management system
+	CodeArtifact is a secure, scalable, and cost-effective artifact management for software development
+	Works with common dependency management tools such as Maven, Gradle, npm, yarn, twine, pip, and NuGet
+	Developers and COdeBuild can then retrive dependencies straight from CodeArtifact
+----------------------------------------------------------------------------------------------------------------
+CodeDeploy - EventBridge Integration
+
+	Event is created when a Package 
+     version is created, modified, or deleted
+
+CodeArtifact --events--> EventBridge---invoke-->Lambda	
+                                    ---activate--> Step Function State Machine
+	                            ---message--> SNS
+	                            ---message--> SQS
+				    ---start---> CodePipeline(CodeCommit, CodeBuild, CodeDeploy)
+---------------------------------------------------------------------------------------------------------------
+CodeArtifact - Resource Policy
+	Can be used to authorize another account to access CodeArtifact
+	A given principal can either read all the packages in a repository or none of then
+
+	Account B                        Account A
+     (222333344555) ---read packages---> (123456789012)
+      IAM USed Bob                       CodeArtifact Repository
+
+{
+"Version':"2020-20-10",
+"Statement":[
+{
+"Effect":"Allow",
+"Action":[
+"codeartifact:DescribePackageVersion",
+"codeartifact:DescribeRepository",
+"codeartifact:GetPackageVersionReadme",
+"codeartifact:GetRepositoryEndpoints",
+"codeartifact:ListPackages",
+"codeartifact:ListPAckageVersions",
+"codeartifact:ListPackageVersionsAssets",
+"codeartifact:ListPackageVersionDependencies",
+"codeartifact:ReadFromRepository"
+],
+"Principal":{
+  "AWS":[
+"arn:aws:iam::123456789012:root",
+"arn:aws:iam::222333344555:user/bob"
+]
+},
+"Resource":"*"
+}
+
+]
+
+}
+=============================================================================================
+CodeArtifact - Upstream Repositories
+	A CodeArtifact repository can have other CodeArtifact repositories as Upstream Repository
+	Allows a package manager client to access the package that are contained in more than one repository using a single repository endpoint
+	Up to 10 Upstream Repositories 
+	Only one external connection
+----------------------------------------------------------------------------------------------
+CodeArtifact - External Connection
+	An External Connection is a connection between a CodeArtifact  Repository and an external /public repository (eg Maven, npm, PyPI, NuGet... )
+	Allows you to fetch packages that are not already present in your CodeArtifact Repository
+	A repository has a maximum of 1 external connection
+	Create many repositories for many external connections
+	
+	Example - Connection to npmjs.com
+		Configure one CodeArtifact Repository in your domain with an external connection to npmjs.com
+		Configure all the other repositories with an upstream to it
+		Package fetches from npmjs.com are cached in the upstream Repository, rather than fetching and storing them in each Repository
+--------------------------------------------------------------------------------------------------
+CodeArtifact - Retention
+	If a requested package version is found in an Upstream Repository, a refewrence to it is retained and is always available from the Downstream Repo
+	The retained package version is not affected by change to the Upstream Repository (deleting it, updating the package)
+	Intermediate repositories do not keep the package
+	
+---------------------------------------------------------------------------------------------------
+CodeArtifact - Domains
+	Deduplicatd Storage - asset only needs to be stored once in a domain, evem if it's available in many repositories (only pay once for storage)
+	Fast Copying - only matadata record are updated when you pull packages from an Upstream CodeArtifact Repository into Downstream
+	Easy Sharing Across Repositories and teams - all the assets and metadate in a domain are encrypted with a single AWS KMS Key
+	Apply Policy Across Multiple Repositories - domain administrator can apply policy across the domain such as:
+		Restricting which accounts have access to repositories in the domain
+		Who can configure connections to public repositories to use sources of package
+=====================================================================================================
+Amazon CodeGuru
+	an ML-powerad service for automated code reviews and application performance recomentations
+	Provides two functionalities
+		CodeGuru Reviewer: automated code reviews for static code analysis (development)
+		CodeGuru Profiler: visibility/recomentations about application perfarmance during rentime (production)
+----------------------------------------------------------------------------------------------------------
+Amazon CodeGuru Reviewer
+	Identify critical issues, security vulnerabilities, and hard to find bugs
+	Example : commin coding best practices,  resource leaks, security detection, input validation
+	Uses ML and automated reasoning
+	Hard-learned lessons across milions of code reviews on 1000s of open source and Amazon repositories
+	Supports Java and Python
+	Integrates with github, Bitbucket and AWS COdeCommit
+
+-------------------------------------------------------------------------------------------------------------
+Amazon CodeGuru profiler
+	Helps understand the runtime behavior of your application
+	Example: identify if your application is consumed excessive CPU capacity on a logging routine
+	Features : 
+		Identify and remove code inefficiencies
+		Improve application performance(e.g. reduce CPU utilization)
+		Decrease compute cost
+		rovides heap summary(identify which objects using up memory)
+		Anomaly Detection
+	Support applications running on AWS or on-premise
+	Minimal overhead on application
+==========================================================================================================
+Amazon CodeGuru - Agent COnfiguration
+	MaxStackDepth - the maximum depth of the stack in the code that is represented in the profile
+		Example: if CodeGuru Profiler finds a method A, which calls method B, which calls method C, which calls methos D then the depth is 4
+		If the MaxStackDepth is set to 2, then the profiler evaluates A and B
+	MemoryUsageLimitPersent - the memory percentage used by the profiler
+	MinimumTimeForReportingInMilliseconds - the minimum time between sending reports
+	ReportingIntervalInMilliseconds - the reporting interval used to report profiles
+	SamplingIntervalInMilliseconds - the sampling interval that is used to profile samples
+		reduce to have a higher sampling rate
+=========================================================================================================
+AWS Cloud9
+	Cloud-based integrated Development Environment(IDE)
+	Code editor, debuger, terminal in a browser
+	Work on your projects from anywhere with an internet connection
+	Prepackaged with essential tools for popular programming languages(JS, Python, PHP,...)
+	Share your development environment with your team (pair programming)
+	Fully integrated with AWS SAM & Lambda to easy build serverless applications
+=========================================================================================================
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

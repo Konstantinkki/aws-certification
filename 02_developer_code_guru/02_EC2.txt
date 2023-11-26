@@ -1,0 +1,894 @@
+EC2 - secure, resizable compute capacity in the Cloud
+	Like a VM, only hosted in AWS instead of your own data center
+	Designed to make-scale cloud computing easier for developers
+	The capacity you want when you need it.
+	You are in complete control of your own instances
+--------------------
+Game Changer - AWS led a big change in the industry by introducing EC2
+Pay Only For What You Use - EC2 changes the economics of computing
+No Wasted Capacity - Select the capacity that you need right now. Grow and shrink when you need 
+--------------------
+
+ON PREMISES INFRASTRUCTURE
+Estimate Capacity
+Long term investment, 3-5 years.
+Expectation that the application will "grow-into" it.
+Lots of wasted capacity
+--------------------
+WAIT minutes, not months
+================================
+OnDemand - pay by the hour or the seconds depending on the type of instance you run
+Reserved - Reserved capacity for one or three years, up to 72% discount on the hourly cherge. Regional !!!
+Spot - Purchase unused capacity at a discount of up to 90% Prices fluctuate with suply and demand
+Dedicated - A physical EC2 server dedicated for your use. The most expensive option.
+--------------
+On-Demand Instances
+	Flexible - Low cost and flexibility of Amazon EC2 without any up-front payment or long-term commitment
+	Short-term - Applications with short-term, spyky, or unpredictable workloads that cannot be interrupted.
+	Testing the Water - Applications being developed or tested on Amazon EC2 for the first time
+---------------
+Reserved Instances
+	Predictable usage - Applicxations with staddy state or predictable usage
+	Specific Capacity Requirements - Applications that require reserved capacity
+	Pay Up-Front - You make up-front payments to reduce their total computing cost even further.
+	Standard Rls(Reserved Instances) - Up to 72% off on-demand price.
+	Convertible RIs - Up to 54% off on-demand price. Has the option to change to a different Reserved Instance type of equal or greater value.
+	Scheduled RIs - Launch within the time window you define. Match your capacity reservation to a predictable recurring schedule 
+		that only requires a fraction of a day, week, or month.
+----------------------
+Spot Instances
+	When to use Spot Instances
+		Flexible - Applications that have flexible start and end times.
+		Coast Sensitive - Applications that are only 8feasible at very low compute price
+		Urgent Capacity - Users with an urgent need for large amounts of additional computing capacity
+-------------------------
+Dedicated Hosts
+	Compliance - Regulatory requirements that may not support multi-tenant virtualization
+	Licensing - Great for licensing which does not support multi-tenancy or cloud deploymemts
+	On-Demand - Can purchased on-demand (hourly)
+	Reserved - Can be purchased as a reservation for up to 70% off the on-demand price
+--------------------------------
+Saving Plans
+	Save up to 72% - All aws Compute usage regardless of instance type or Region
+	Commit To one ot 3 Years - Commit to use a specific amount of compute power- (measured in $/hour) for a one-year or 3-year period
+	Super Flexible - Not only EC2, also includes serverless technology like lambda and Fargate
+----------------------------------------
+Calculetor - 'https://calculator.aws/#/'
+=====================================
+Ec2 Instance types 
+	Hardware  - When you launch an Instance, the instance type determines ,the hardware of the host computer used for your instance.
+	Capabilities - Each instance type offers different compute, memory, and storage capabilities. These types are grouped in instance Families
+	Application Requirements - Select an instamce type based on the requirements of the application that yoy plane to run on your instance.
+
+	Instance types are optimized to fit fifferent use cases and give you the flexibility to choose the appropriate mix of resource for your applications
+
+instance description - 'https://aws.amazon.com/ec2/instance-types'
+
+-----------------------------------------
+connect with PUTTY
+	Download and install putty
+	Launch an EC2 instance
+	Download the .pem file
+	Convert the .pem file to .ppk
+	Connect to our EC2 instance
+-----------------------------------------
+EC2 Instance Connect
+	Launch an EC2 Instance - we'll launch an instance that we can connect to 
+	Enable SSH  - Create an SSH key pair, and ensure the security group allows SSH access
+	Connect Using EC2 Instance Connect - From within the AWS console
+=================================================
+EBS(Elastic Block Store) Volumes
+	Storage volumes that you can attach to your EC2 instances.
+		Use them the same way you would use any system diak
+		Create a file system
+		Run a database
+		Run an operating system
+		Store Data
+		install applications
+---------------------------------------------------
+MISSION CRITICAL
+	Production workloads - Designed for mission ,critical workloads.
+	Highly Available - Automatically replicated within a single Availability Zone to protect against hardware failures
+	Scalable - Dynamically increase capacity and change the type volume with no downtime or performance impact to your live systems
+----------------------------------------------------
+General Pirpose SSD (gp2) - balance of price and performance
+	3IOPS per GiB, up to a maximum of 16000 IOPS per volume
+	gp2 volumes smaller than 1TB can burst up to 3000 IOPS
+----------------------------------------------------
+General Purpose SSD (gp3)
+	the latest generation.
+	Baseline of 3000 IOPS for any volume size (1Gb-16TB )
+	Delivering up to 16000 IOPS
+	20% cheapper than gp2
+	tLike gp2, they are good for boot volumes or development and test applications which are not latency sensitive.
+---------------------------------------------------
+Provisioned IOPS SSD (io1) - high performance option, and the most expensive
+	Up to 64000 IOPS per volume. 50 IOPS per GiB
+	Use if you need more than 16000 IOPS
+	Designed for I/O intensive applications, large databases, and latency-sensitive workloads
+---------------------------------------------------
+Provisioned IOPS SSD (io2)
+	Latest generation.
+	Higher durability and more IOPS
+
+	io2 is the same price as io1
+
+	500 IOPS per GiB Up to 64000 IOPS
+
+	99.999% durability instead of up to 99.9%
+
+	I/O intensive apps, large databases, and latency-sensitive workloads. Applications which need high levels of durability
+-----------------------------------------------------
+Provisioned IOPS SSD io2 Block Express
+	SAN (Storage Area Network) in the cloud.
+	highest performance, sub-millisecond latency.
+	
+	Uses EBS Block Express architecture
+	4x throughput, IOPS, and capacity of regular 7io2 volumes
+	Up to 64TB, 256000 IOPS per volume
+	99.999% durability
+
+	Great for the largest, most critical, high-performance applications like SAP, HANA, Oracle, Microsoft SQL Server, and IBM DB2
+-----------------------------------------------------
+Throughput Optimized HDD (st1)
+	low cost HDD volume
+	Baseline throughput of 40 MB/s per TB
+	Ability to burst up to 250 MB/s per TB
+	Maximum throughput of 500 MB/s per volume
+	Frequently-accessed, throughput-intensive workloads
+	Big Datam data warehouses, ETL, and log processing
+	A cost effective way to store mountains of data
+	Cannot be a boot volume
+--------------------------------------------------------
+COLD (SC1)
+	Lowest cost Option
+	
+	Baseline throughput of 12 MB/s per TB
+	Ability to brust up to 80 MB/s per TB
+	Max throughput of 250 MB/s per volume
+	A good choice for colder data requiring fewer scans per day
+	Good for applications that need the lowest cost and performance is not a factor
+	Cannot be a boot volume
+---------------------------------------------------------
+IOPS vs Throughput
+
+IOPS : 
+	Measures the number of read and write operations per secondz
+	Important metric for quick transactions, low latency apps, transactional workloads
+	The abbility to action reads and writes very quickly
+	Choose Provisioned IOPS DDS (io1 or io2)
+
+Throughput:
+	Measures the number of bits read or written per second(MB/s)
+	Important metric for large databases, large I/O sizes, complex queries
+	The ability to deal with large databases
+	Choose Throughput Optimized HDD (st1)
+----------------------------------------------------------------
+EBS Volumes : https://aws.amazon.com/ebs/volume-types/
+=================================================================
+EBS Volumes Exam Tips 
+	Default Encryption - If encryption by default is set on your account by your account admin, you cannot create unencrypted EBS Volumes
+	Encrypted Snapshots - If you can create an EBS volume from an encrypted snapshot, then you will get an encrypted volume
+	Unencrypted Snapshots - If you create an EBS volume from an unencrypted snapshot, then encryption is only optional  
+		if default encryption has not been set at account level by your acount admin.
+====================================================================
+ELB (Elastic Load Balancer)
+	A load balancer distributes network traffic across a group of servers
+	We can easily increase capacity when needed
+----------------------------------------------------------
+Elastic Load balancer
+	Application LB - HTTP HTTPS
+	Network LB - TCP and high performance
+	Classic - http/https/ tcp - LEGACY!!!!
+----------------------------------------------------------
+Gateway Load Balancer
+	Allows you to load balance workloads for xthird-party virtual appliances running in AWS, such as:
+		Virtual appliances purchased using the AWS merketplace
+		Virtual firawalls from companies like FortItet, Palo Alto, Juniper, Cisco
+		IDS/IPS system from companies like CheckPoint, Trend Micro, etc
+------------------------------------------
+ALB 
+	Used for load balancing HTTP/HTTPS trafic. They operate at Layer 7 and are application-aware
+	They support advanced request routing to specific web servers based on the HTTP header
+-------------------------------------------
+7 Layer Model
+	What is it?
+		A conseptual framework which describes the functions of a network.
+		Beginning with the application layer, which directly serves the end user, down to the physical layer
+
+Layer 7 (Application) - What the end user sees, HTTP, web browseer
+Layer 6 (Presentation) - Data is in a usable format. Encryption, SSH
+Layer 5 (Session) - Maintains connections and sessions
+Layer 4 (Transport) - Transmit data using TCP and UDP
+Layer 3 (Network) - Logically routes packets, based on IP address
+Layer 2 (Data Link) - Physically transmits data based on MAC addresses.
+Layer 1 (Physical) - Transmits bits and bytes over physical devices
+--------------------------------------------------------------------
+Network Load Balancer
+	High Performance - used for load balancing TCP traffic where extwreme performance is required
+	Operating at Layer 4(Transport Layer)
+	Capable of handling millions of requests per second while maintaining ultra-low latencies
+	As it is high performance, it is also the most expensive option
+--------------------------------------------------------------------
+Classic LB - OLD LEGACY
+	Legacy - Classic LB are the legacy option but may still appear in the exam
+	HTTP/HTTPS - Supports Layer 7 - specific features such as X-Forwarded-for headers and sticky sessions.
+	TCP - Supports Layer 4 load balancing for applications that rely purely on the TCP protocol
+---------------------------------------------------------------------
+X-Forwarded-For Header
+	Identity the Originating IP address of a client connecting through a load balancer
+---------------------------------------
+Common LB Errors
+	504 - Gateway Timeout - target failed to respond
+	CHECK YOUR APPLICATION
+		The ELB could not establish a connection to zthe target e.g. the web server, database, or lambda function
+		Your application is having issues
+	Identify where the application is failing and fix the problem
+--------------------------------------------
+Elastic LB Exam tips
+	Applicatio LB 
+	Network LB
+	Classic LB
+	Gateway LB
+	X-Forwarded-For - if you need the IPv4 address of your and user, look for the X-Forwarded-For header
+===========================================
+
+Route 53  Exam Tips
+	Launch an EC2 Instance + install httpd
+	Create an Application LB + configure our EC2 instance as a target
+	Configure a Route 53 ALias + Map a friendly domain name to our ALB. So we can access our website using our own domain name
+==============================================
+ AWS CLI
+	https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+	https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html
+------------------------------------------------
+AWS CLI Exam Tips
+	Lease Privilege - Always give your users minimum amount of access required to do their job
+	Use Groups - Create IAM groups and assign your users to groups. Group permissions are assigned using IAM policy documents
+	Secret Access Key - you will only see this once! if you lose it - delete and create again, and recobfigure CLI
+	Don't share Kay Pairs
+	Supports Linux Windows MacOs
+-----------------------------------------------
+AWS Cli Pagination
+	You can control the number if items included in the output when you run a CLI command
+	By default, the AWS CLI uses a page size of 1000
+	i.e. If you run 'aws s3api list-objects my_bucket' - on a bucket which contains 2500 objects, the CLI actually makes 3 APIcalls to S3... 
+		but displays the entire output in one go.
+-----------------------------------------------
+CLI Pagination Errors
+	If you see errors when running list commands on a lerger number of resources, the default page size of 1000 might be too long
+	You are most likely to see a 'timed out' error, because the API call has exceedrd the maximum allowed time to fetch the required result
+
+FIX :
+	To fix this, use the '--page-size' option to have the CLI request a smaller number if items from each api call 
+		- WILL GET ALL ITEMS WITH (all/page-size) COUNT OF CALLS
+	
+	The CLI still retrives the full list, but performs a larger number of APIcalls in the background and retrives a smaller number of items with each call
+	
+	Use the '--max-items' option to return fewer items in the CLI output  WILL RETURN ITEMS COUNT = max-items
+------------------------------------------------
+Exam tips
+	If you do see errors like 'timed out' or errors related to too many results being returned:
+		Ajust the pagination in of CLI results to avoid errors generated by too many results
+		aws s3api list-objects --bucket my-bucket --page-size = 100
+	Teh CLI still retrives the full list, but performs a larger number of API calls in the background 
+		and retrives a smaller number of items with each call
+===================================================
+WORKING WITH AWS CLOUDSHELL 
+	can run from AWS console
+	Linux terminal
+	Can run commands
+=======================================================
+Launch an EC2 instance with an S3 role demo
+	1. create IAM role with S3 access
+	2. Create EC2 Instance and attach a role 
+	3. Access S3 from EC2 Instance
+-------------------------------------------------------
+      aws configure list
+
+      aws s3 ls
+      aws s3 mb s3://kostestembhz
+      echo 'sfasfdsafdfd' > file.txt
+      aws s3 cp file.txt s3://kostestembhz
+-------------------------------------------
+Exam Tips
+	The Prefered Option - Roles are prefered from a security perspective.
+	Avoid Hard Coding Your Credentials - Roles allow you to provide access without the use of access key IDs and secret access keys
+	Policies - Policies controll a role's permissions
+	Updated - You can update a policy attached toa role, and it will take immediate effect
+	Attaching and Detaching  - You can attache and detach roles to running EC2 instances without having to stop or terminate these instances
+======================================================
+RDS - Relational Databases 
+	Tables - Data organized into tables Thanks of a tradittional apreadsheet
+	Rows - The data items
+	Columns - The fields in the database
+--------------
+When would we use an RDS database  ?
+	RDS is generally used for Online Transaction Processing (OLTP) workloads
+----------
+SQL Server
+Oracle
+MySql
+PostgresSql
+MariaDB
+Aurora
+-----------------------------
+Online Transaction Processing (OLTP) vs Online Analytics Processing (OLAP)
+
+OLTP
+	Processes data from transactions in real time e.g. customer orders, banking, transactions, payments, and booking systems.
+	OLTP is all about data procssing, and completing large numbers of small transactions in real time
+
+OLAP
+	Processes complex queries to analyze historical data, e.g. analyzing net profit figures from the past 3 years, and sales forecasting.
+	OLAP is all about data analyzis using large amounts of data, and complex queries that take a long time to complete
+-----------------------------
+Exam tips
+	RDS Database Types 
+	RDS for OLTP workloads
+	Not Suitable for OLAP
+---------------------------------
+RDS DEMO
+	1. Launch an RDS Instance using the AWS console
+	2. Launch an EC2 Instance - Install a MySql database client
+	3. Connect to the RDS Instance - Connect from EC2 using teh MySql db Client
+=================================
+Multi AZ  & Read Replicas
+	For Disaster Recovery not for improve performance !!! you cannot connect to the Standby when Primary DB is active
+	It's an exact copy of your production database in another AZ
+	AWS handles the replication for you
+		When you write to your production database, this write will automatically synchronize to the atandby database
+-------------------------------
+Which RDS Types Can be configured as Multi-AZ ?
+	SQL Server
+	Oracle
+	MySql 
+	PostgresSql
+	MariaDB
+-------------------------------
+Read Replicas - for improve performance read only copy of primary DB
+	may be locates in same AZ or be a cross AZ or cross Region
+	Allows up to 5 Read Replicas
+----------------------------
+RDS Multi-AZ and Read Replica Exam Tips
+	Multi AZ :	
+		An Exact copy of your production db in another AZ 
+	        Used for DR
+		In the event of a failure, RDS will automatically failover to the standby instance
+	Read Replica:
+		A read-only copy of your primary db in the same AZ, cross AZ, cross-region
+		Used to increase ir scale read performance
+		Great for read-heavy workloads and takes the load off your primary database for read-only workloads e.g. Business Intelligence reporting jobs
+==============================
+RDS BAckups and snapshorts
+	Types of RDS BAckup
+	    Two ways to Backup RDS
+		1.Database snapshot - Manual ad-hoc, and user initiated. It provides a snapshot of the storage volume attached to the DB instance
+		2. Automated Backup - Enabled by default. It creates daily backups or snapshots that run during a backup window that you define
+			Transaction logs are used to replay transactions
+------------------------------
+RDS Auto Backup
+	1. Point-in-time Recovery - Recover your database to any point in time within a 'retention period' of 1-35 days
+	2. Fully Daily Backup - RDS takes a full daily backup, or snapshot, and also stores transaction logs throughout the day
+	3.The Recovery Process - When you do a recovery, AWS will first choose the most recent daily backup and than apply transaction logs 
+		relevant to the recovery point
+
+Example : dayly backup in time (2-5 am)  + Transaction logs with all updates = we can restore backup + execute all from transaction backup (restore for any time)
+
+
+	Stored In S3 - Auto backup and snapshots are stored in S2
+	Free storage - you ge free storage space equal to the size of your database. So if you have an RDS instance of 10 Gb, yuo will get 100Gb wotrth of storage
+	Defined Backup Windows - During the backup window, storage IO may be suspended for a few seconds while the backup process initializes, and you may 
+		experience increased latency at this time
+-----------------------------------
+Restoring RDS DB
+	The restored version of the db will always be a new RDS instance with a new DNS endpoint.
+----------------------------------------
+Encryption at Rest
+	Enabling Encryption
+		Enable encryption at creation time by selecting the encryption option in the console
+	Integrated with KMS
+		Encryption is done using the AWS KMService AES-256 encryption
+	Include All DB Storage
+		Includes all the underlying storage, automated backups, snapshots, logs, and read replicas
+-----------
+You can't enable encryption on an unencrypted RDS DB Instance
+	Unencrypted DB --->Snapshot---->Encrypted Snapshot----> Encrypted DB
+-------------------------------------
+Backup  and Snapshot Exam Tips
+	Automated Backup:
+		Automated, enabled by default, you define the backup window 
+		Point in time snapshot + transaction logs
+		Retention period of 1-35 days
+		Can be used to recover your database to any point in time within the retention period
+
+	DB Snapshot
+		User initiated, ad-hoc
+		Point in time - snapshot only
+		No retention period; stored indefinitely
+		Used to back up your DB instance to a known state and restore to that specific state at any time, e.g. before making a change to the DB
+----------------------------------------
+RDS Encryption Exam tips
+	1 Enable at Creation - includes all underlying storage, auto backups, snapshots, logs and read replicas
+	2 KMS Integration - uses the KMS service for AES-256 encryption
+	3 Existing RDS Instance - Take a snapshot, encrypt the snapshot, then create a new RDS instance from the encrypted snapshot
+==========================
+Increasing Scalability with RDS Proxy:
+	How RDS Proxy works
+	RDS Proxy Fault Tolerance
+	Other Use Cases
+	Exam Tips
+------------------------
+RDS Proxy - pools and shares database connections to assist with application scalability and database efficiency
+------------------------
+Increase Application Availability
+	Serverless and scales automatically - to your workload throuhg pooling and sharing database connections
+	Preserves application connections - during failover
+	Detects failover and routes requests - to standby quickly
+	Deployable over multi-AZ for protection - from infrastructure failure
+	Up to 66% faster failover times
+----------------------------
+Other Use Cases
+	Applications :
+		with unpredictable workloads
+		that open/close database connections infrequently
+		that require availability through transient failures
+		with open but idle connections
+=========================================
+ELASTICACHE
+	1. In-memeory Cache (key Value) - ElastiCache makes it easy to deploy, operate, and scale an in-memory cache in the cloud
+	2. Improves Database Performance - It allows you to retrive information from fast, in-memory cache instead of slower disk-based storage
+	3. Great for Read-Heavy Database Workloads - Caching the results of I/O intensive database queries. Also for storing session data for distributed applications
+--------------------------------------
+Types of ElastiCache:
+	1. yMemcached : 
+		Great for basic object caching.
+		Scales Horizontally, but there is no persistance, Muli-AZ or failover
+		A good choice if you just want basic caching and you want your caching model to ba as simple as possible
+
+	2. Redis:
+		A more sophisticated solution with enterprise features like persistence, replication, Multi-AZ, and failover.
+		Supports sorting and ranking data (e.g. for gaming leaderboards), and complex data types like lists and hashes
+------------------------------------------
+Typical Scenario
+	1. Database under stress - You will be given a scenario where a particular database is under a lot of stress
+	2. Find a solution  - You may be asked which service you should use to alleviate this
+	3. Know when to use ElasriCache - is a good choice if your database is particulary read-heavy and not prone to frequent changing
+----------------------------
+When ElastiCache Can't Help
+	1. Heavy Write Loads - yCaching will not help allieviate heavy write loads, so you may need to scale up your database
+	2. OLAP Queries - If your database is feeling stress because you are performing Online Analytical Processing. Think about RedShift instead
+----------------------------
+ElastiCache Exam Tips
+	EC - is an in-memory cache designed to improve read performance for read-heavy databases.
+	
+	Memcached :
+		in-memory, key value data store
+		Object Caching is your primary goal
+		You want to keep things as simple as possible
+		You don't need persistance or multi AZ
+		You don't need to support advanced data types or sorting
+
+	Redis:
+		in-memory, key-value data store
+		You are performing data sorting and ranking, such as gaming leaderboards.	
+		You have advanced data types, such as liat or hashes
+		You need multi AZ
+================================
+MemoryDB for Redis
+	What is MemoryDB for Redis?
+	What is suitable For?
+	MemoryDB vs, ElastiCache
+	Exam tips
+-----------------------------
+What is MemDB for Redis?
+	Massive Scalable - in-memory database (GB to > 100TB)
+	Highly Available - Multi-AZ Transaction log recovery and durability
+	Primary Database - The entire dataset for an application can be stored in memory (instead of a database plus a cache).
+	Ultra-fast performance - Supports > 160 million requests per second. Microsecond read and single-digit millisecond write latency.
+-----------------------------
+MemoryDB for Redis Suitable Uses
+	1. Workloads - Requiring an ultra-fast, Redis - compatible primary database
+	2. Applications - Data-intensive, low latency applications that also require high scalability
+	3. High Performance - Applications that need an in-memory database to handle millions of requests per second
+	4. Microservices - Highly scalable microservices architecture
+----------------------------
+What's the difference?
+	They are both in-memory data stores that help applications to access data 2faster than reading from disk
+	
+	ElastiCache for Redis:
+		Database Cache - in-memory database cacheservice. Sits in front of a database like RDS.
+		FAST BUT NOT ULTRA-FAST - Milliseconds read latency.
+		USE CASE - A website that needs to store session data for its customers.
+	
+	MemoryDB for Redis
+		PRIMARY DATABASE - Reduce complexity by removing the need for a database plus a cache.
+		ULTRA-FAST PERFORMANCE - Microseconds read and single-digital millisecond write latency.
+		USE CASE - An Online gamming company with millions of users sharing digital assets 
+--------------------------------
+MemoryDB for Redis Exam tips
+	In-memory Database
+	Use cases
+	MemoryDB vs Elasticache
+=============================================
+Parameter Store 
+	in web console "System Manager" - > Application Management -> Parameter Store
+---------------------------------------------
+Exam Tips
+	Store confidential Information - You can store passwords, database connection strings, license code , etc
+	Plain text or Encrypted - You can store values as plain text or encryptthem 
+	Reference - You can reference your parameters using the parameter name (e.g. in a bootstrap script)
+	Integrated with AWS Services - You can use Parameter Store with EC2, CloudFormation, Lambda, CodeBuild,Code Pipeline, and CodeDeploy
+===============================================
+Secrets Manager
+	Protect and store secrets - AWS Services, IT Resources and Applications
+	- Centraly Manage - Secrets used to accesss resources inside and outside of AWS
+	- Rotate - Secrets without code deployment
+	- Secure - Secrets with control of fine-grain permissions and encryption with AWS KMS.
+	- Secret Storage Types -RDS Database, Redshift Cluster, DocumentDB Database, Other Databases, API Key
+
+	Information Stored in Secrets:
+	- Username and PAssword
+	- Server Address
+	- Database Name and Port
+-------------------------------------------------
+Secrets are Encrypted Using an AWS KMS Key 
+	Customer Master Key (CMK) - Logicalrepresentation of a master key, which holds key material to encrypt data. CMKs can only encrypt up to 4KB of data
+
+Configure Automatic Rotation of Secrets
+	Every 30, 60, 90 or custom # of days
+	Create new or use existing Lambda for secret rotation
+-------------------------------------------------
+Demo Objectives
+	1. Create an RDS database - We'll use PostgreSQL
+	2. Create a Secret - Store the database password.
+	3. View Secret Information
+--------------------------------------------------
+Secret Manager vs Parameter Store
+	Secret MAnager:
+		Database Credentials
+		API Keys
+		Rotation of Keys
+	System Manager:
+		Wide use Cases
+		Configuration Variables
+		License Keys
+-----------------------------------------------------
+Exam Tips
+	Centrally Manage - Secrets used to access resources inside and outside AWS
+	Rotate - Secrets without code deployment
+	Secure - Secrets with control of fine-grain permissions and encryption with AWS KMS
+	SecretTypes - RDS Database, Redshift cluster, DocumentDB Database, Other Databases, API Keys
+++++
+        Secret MAnager:
+                Database Credentials
+                API Keys
+                Rotation of Keys
+        System Manager:
+                Wide use Cases
+                Configuration Variables
+                License Keys
+============================================================
+Ec2 Image builder
+	What is EC2 Image builder
+	Why is it so cool?
+	How does it works
+	Terminology	
+	Exam Tips
+-------------------------------------------
+What is EC2 Image Builder?
+	Create EC2 Images - virtual machine images (AMIs) and Container Images
+	Simple to use - Graphical interface.
+	Validate Your Images - Test and validate images, e.g. for security compliance and functionality, using AWS provided tests or your own custom tests.
+-------------------------------------------
+Why Is It Cool ?
+	EC2 image builder automates the process of creating and maintaining your images.
+	  When software updates are available, Image builder can automatically create a new image, run validation tests on the new image, 
+	  and make it available it to the AWS regions of your choice
+	
+	Image builder allows you to share your AMIs with other AWS accounts that you own
+--------------------------------------------
+How does it works?
+	1. Base OS - provide a base OS image, e.g. Amazon Linux 2 AMI
+	2. Software - Define software to install, e.g. .NET, Node.js, Python, latest security updates, latest kernel, security settings.
+	3. Test - Run tests on the new image. For example, does it boot correctly?
+	4. Distribute - destribute the image to the regions of your choice (by default, the region you are operating in).
+-------------------------------------------
+EC2 Image Builder Terminology
+	Image Pipeline - "Defines the configuration" and end-to-end process of building images. Including the image recipe, distribution and test settings
+	Image Recipe - "Image builder" creates a recipe for each image, which can be shared,  version controlled, and reused
+		Example : "Source image" - Amazon Linux 1 AMI
+		          "Build Components" - Apache Tomcat
+	Build Components - "The software components" to include in the image.
+-------------------------------------------
+Exam Tips
+	1. EC2 Image Builder Automates the process of creating and maintaining AMI and Container images.
+	2. 4-step process - Select a base OS image, customize by adding software, test and distribute to your chosen region.
+	3. Terminology: 
+		- Image pipeline:  settings and process
+		- Image recipe: Source image and build components
+		- Build components: The software to include
+==============================================
+Creating an AMI using EC2 image builder
+	1. Create an IAM Role - add permisions for EC2 Image Builder
+	2. Create an Image Pipeline - This is where we'll define our configuration settings.
+	3. Execute the pipeline - Notice Image Builder launches temporary "build" and "test" EC2 instances
+	4. View the Image - We can view the image in image Builder and from the EC2 console under AMIs
+------------------------------------------------
+Using AMIs in a different regions:
+	AMIs are regional 
+	Copying an AMI
+	Encryption and Copying
+	Exam Tips
+-----------------------------------------
+An AMI only exists in a single Region - You can only use it in the Region it belongs to.
+	If you have an AMI in us-east-1 that you want to use in us-east2, ypu'll need to create a copy for us-east-2
+-----------------------------------------
+Copying scenarious:
+	Unencrypted  AMI to Unencrypted AMI - TRUE
+	Encrypted to Encrypted - TRUE
+	Unencrypted to Encrypted - TRUE
+	Encrypted to Unencrypted - FALSE
+
+By default "if you do not specify encryption parameters" the AMI is copied with its original encryplion status 
+==========================================
+SUMMARY : 
+	EC2 is like a VM that is hosted in AWS Instead of your data center
+		1. Select the capacity that you need right now.
+		2. Grow and shink when you need.
+		3. Pay for that you use
+		4. Wait minutes, not months
+-----------------------------------------
+Pricing Options:
+	1. On-Demand - Pay by the hour or the second depending on the type of instance you run. Great for flexibility.
+	2. Reserved - reserve capacity for 1-3 years. Up to 72% discounton the hourly charge. Great if you have known, fixed requirements
+	3. Spot - Purchase unused capacity at a discount of up to 90%. Prices fluctuate with supply and demand. Great for applications with flexible start/end times
+	4. Dedicated - A physical EC2 server dedicated for your use. Great if you have server-bound licenses to reuse or compliance requirements.
+-----------------------------------------
+Determines the hardware of the host computer.
+	Each instance type offers different compute, memory, and storage capabilities. These types are grouped in instance families.
+	Select an instance type based on the requirements of yuor application.
+-----------------------------------------
+Highly available and scalable storage volumes you can attach to an EC2 instance
+
+EBS: SSD Volumes - Highly available and scalable storage volumes you can attach to an EC2 instance
+	GP2 - Generap Purpose SSD
+		Suitable for "boot disk" and "general applications" Up to 16000 IOPS per volume. Up to 99.9 durability
+	GP3 - LAtest Generation General Purpose SSD
+		Suitable for "boot disk" and "general applications". Baseline of 3000 IOPS for all volumes. Up to 16000 IOPS per volume. Up to 99.9 durability 
+	io1 - Provisioned IOPS SSD
+		Suitable for OLTP and "latency-sensitive" applications 50 IOPS/Gib, Up to 64000 IOPS per volume. 
+		High performance and most expensive. up to 99.9% durability
+	io2 - Suitable for OLTP and "latency-sensitive" applications 500 IOPS/Gib, Up to 64000 IOPS per volume. 99.999% durability.
+	
+	io2 Block Express - Provisioned IOPS SSD
+		For the "largest, most critical, high-performance" applications: SAP HANA, Oracle, Ms SQL Server, and IBM DB2. 
+		Up to 64 TB, 256000 IOPS per volume. 99.999% durability.
+
+EBS - HDD Volumes:
+	st1 - Throughput Optimized HDD
+		Suitable for Big Data, data warehouses, ETL. Max throughput 500MB/s per volume. Cannot be a boot volume. Up to 99.9% durability
+	Sc1 - Cold HDD
+		Max throughput  of 250 MB/s per volume. Less=frequently-accessed data. Cannot be a boot volume.Lowest cost. Up to 99.9% durability.
+---------------------------------------------
+EBS Snapshot Exam Tips : 
+	1. EBS Snapshots - A point-in-time copy of an EBS volume. Great for backing up EBS volumes. You can use a snapshot to create a new EBS Volume.
+	2. Encrypted snapshots - If you create a new EBS volume from an encrypted snapshot, then you will get an encrypted volume.
+	3. Unencrypted snapshot - If you create a new EBS volume from an unencrypted snapshot, then you will get an unencrypted volume
+----------------------------------------------
+Elastic Load Balancer Exam TIps:
+	ALB - inteligent load balancing for HTTP/HTTPS. Routes requests to a specific web server based on request type
+	Network LB - Provides High performance load balancing for TCP traffic
+	Classic LB - Teh legacy option that supports both HTTP/HTTPS and TCP. May still appear in the exam.
+	Gateway LB - Provides load balancing for third-party virtual applications
+	X-Forwarded-For if you need the IPv4 address of your and user, look for the X-Forwarded-For HTTP header
+	504 Error - Gateway timeout. The application is not responding within the timeout period.	Troubleshoot your application or database server.
+----------------------------------------------
+Route 53 Exam Tips
+	Route 53 - Amazon's DNS service.
+	Map a Domain Name - EC2 Instance, Elastic Load Balancer, S3 Bucket
+	Route 53 Terminology - 
+		"Hosted Zone" - A container for DNS records for your domain.
+		"Alias" - Allows you to route traffic addressed to the zone apex, or the top of the DNS namespace e.g. cloud.com 
+			  and send it to a resource within AWS, e.g. an Elastic LB
+		"A Record" - Allows you to route traffic to a resource, such as a web server, using an IPv4 address
+---------------------------------------------------------------
+AWS CLI Exam tips
+	Least Privilege
+	Use groups
+	Secret access Key - weill see only once - command in cli = aws configure 
+	Don't share Key PAirs
+	Supports Linux, Windows, MacOS
+----------------------------------------------------------------
+Using Roles with EC2 - Exam Tips
+	Roles can be used to give EC2 instances access to AWS resources like S3.
+	1. Create IAM Role - With S3 access
+	2. Create an EC2 Instance - Attach the role we just created
+	3. Access S3 - try to access s3 from our EC2 instance
+	Predered option - Roles are preferred from a security perspective.
+	Avoid Hard Coding Your Credentials - Roles allows you to provide access without having to manage access key IDs and secret access keys.
+	Policies - Policies control a roles permissions
+	Updates - You can update a policy attached to a role, and it will take immediate effect.
+	Attaching and Detaching - you can attach and detach roles to running EC2 instances without having to stop or terminate these instances.
+----------------------------------------------------------------
+RDS Exap Tips
+	1. RDS Database Types - SQLServer, Oracle, MySQL, PostgreSQL, MariaDB, and Amazon Aurora.
+	2. RDS is for OLTP Workloads - Great for processing lots of small transactions, like customer orders, banking transactions, payments, and booking systems
+	3. Not Suitable For OLAP - Use RedShift for OLAP and data warehousing tasks like analyzing large amounts of data, reporting, and sales forecasting.
+-----------------------------------------------------------------
+Backup vs Snapshot Exap tipsz
+	Auto backup 
+	1. Automated enabled by default, you define the backup window.
+	2. Point-in-time snapshot plus transaction logs
+	3. Retention period of up to 35 days.
+	4. Can be used to recover your database to any point in time within the retention period
+
+	DB Snapshot
+	1. User-initiated, ad-hoc.
+	2. Point-in-time snapshot only.
+	3. No retention period; stored indefinitely.
+	4. Used to back up your DB instance to a known state and restore to that specific state at any time, e.g. before making a change to the database
+--------------------------------------------------------------
+RDS Encryption Exam tips 
+	1. Enable at Creation - includes all underlying storage, automated backups, snapshots, logs, and read replicas.
+	2. KMS Integration - Uses the AWS Key Management Service (KMS) service for AES-256 bit encryption
+	3. Existing RDS Instances = Take a snapshot, encrypt the snapshot, than create a new RDS instance from the encrypted snapshot
+--------------------------------------------------------------
+Multi AZ and Read Replica Exam tips 
+	Multi AZ:
+	1. An exact copy of your production database in another Availability Zone.
+	2. Used for disaster recovery.
+	3. In teh event of a failure, RDS will automatically failover to the standby instance.
+	
+	Read Replica:
+	1. A read-only copy of ypur primary database in the same AZ, cross-AZ, or cross-region.
+	2. Used to increase or scale read performance.
+	3. Great for read-heavy workloads and takes the load of your primary database for read-only workloads, e.g. BUsiness intelligence reporting jobs.
+-----------------------------------------------------------------
+ElastiCache Exam Tips
+	ElastiCache is an in-memory cache designed to improve read performance for read-heavy databases.
+
+	Memcache:
+	1. In-memory, key-value data store
+	2. Object caching is your primary goal 
+	3. You want to keep things as simple as possible
+	4. You don't need persistance or Multi-AZ
+	5. You don't need to support advanced data types of sorting
+
+	Redis:
+	1. in-memory, key-value data store
+	2. you are performing data sorting and ranking, such as gaming leaderboards.
+	3. you have advanced data types, such as list and hashes.
+	4. You need data persistance.
+	5. You need Multi-AZ
+-------------------------------------------------------------------
+Parameter Store - Exam Tips
+	Store Confidential Information - Passwords, database connection strings, licensecodes, etc.
+	Plain text or Encrypted - You can store values as plain text or encrypt them
+	Reference - You can reference your parameters using the parameter name, e.g. in a bootstrap script
+	Integrated with aws Services - You can use Parameter Store with EC2, CloudFormation, Lambda, CodeBuild, CodePipeline, and CodeDeploy
+-------------------------------------------------------------------
+AWS Secrets Manager Exam Tips
+	Secrets Manager
+	1. Database Credentials
+	2. API Keys
+	3. Supports Rotation
+	
+	Parameter Store
+	1. Wider Use Cases
+	2. Configuration Variables
+	3. License Keys
+-------------------------------------------------------------------
+Introducing MemoryDB for Redix Exam Tips
+	1. In-memory Database - Ultra fast performance. Microseconds read and single-digit millisecond write. Massively scalable > 100TB
+	2. Use Cases - High Performance, large-scale microservices applications. Online gaming with millions of users sharing digital accets
+	3. MemoryDB vs ElastiCache - MemoryDB can store your whole dataset in memory - no DB required. ElastiCache is an in-memory cache for databases (RDS)
+-------------------------------------------------------------------
+RDS Proxy between user and DB 
+--------------------------------------------------------------
+Increase Application Availability 
+	serverless and scales automatically - to your workloads through pooling and sharing database connections
+	Preserves application connections - during failover
+	Detects failover and routes requests - to a standby quickly
+	Deployable over Multi-AZ for protection - from infrastructure failure
+	Up to 66 faster failover times
+------------------------------------------------------------------
+
+EC2 Image Builder
+    Automated - EC2 Image Builder automates the process of creating and maintaining AMI and container images
+    4-step process - Select a base OS image, customize by adding software, test, and distribute to your choosen region
+    To use an AMI in a different Region, create a copy with specify of dest region,  
+	You can apply encryption during the copying process.
+	You cannot remove encryption during the copying process
+	
+-------------------------------------------
+ 
+
+
+
+
+
+
+
+		
+
+	
+
+
+ 
+
+
+		
+	
+
+
+
+
+	
+
+
+
+
+
+
+		
+		
+
+
+
+	
+
+
+	
+
+
+
+
+		
+
+
+	
+	 
+	
+
+
+
+
+	
+	
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

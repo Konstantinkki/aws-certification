@@ -1,0 +1,360 @@
+What is DynamoDB?
+1.Fast Flexible NoSQL Database - Consistent, single-digit millisecond latency at any acale.
+2. Fully Managed - Supports key-value data models, Supported document formats are JSON, HTML, XML
+3. Use Cases - A great fit for mobile, web, gaming, ad tech, IoT, and many other applications.
+----------------
+Dynamo - serverless, integrates well with Lambda.
+	DynamoDB can be configured to automatically scale.
+	A popular choice for developers and architects who are designing serverless apps.
+---------------
+Dynamo Features
+	Performance - SSD Storage
+	Resilience - Apred across 3 geographically distinct data centers
+	Consistency - Eventually consistent reads (default) Strongly consistent read
+--------------
+Eventually Consistent Reads - Consistency across all copies of data is usually reached within a second. 'Best for read performance'
+Strongly Consistent Reads - A strongly consistent read always reflects all successful writes. 
+			    Writes are reflected across all 3 locations at obce. 'Best for read consistency'
+ACID Transactions - 'DynamoDB Transactions' provide the ability to perform ACID Transactions (Atomic, Consistent, Isolated, DUrable).
+		    Read or write multiple items across multiple tables as an 'all or nothing operation'
+--------------
+DynamoDB Primary Keys
+	What is Primary Key?
+		DynamoDB stores and retrives data based on a primary key.
+	Two types 
+		Partition Key
+		Composite key (partition key + sort key)
+--------------
+Partition Key - a unique attribute
+		Customer_ID=76843567834, product_ID, email address, vehicle registration number
+	Value of the Partition Key is input to an internal hash function which determines the partition or physical location on which the data is stored.
+	If you are using the partition key as your primary key, then no 2 items can have the same partition key.
+-------------
+Composite Key
+	Partition Key + Sort key
+-------------
+Exam Tips:
+	1. What is DynamoDB?  - is a low latency NoSQL database
+	2. Data Models - Supports both document and key-value data models. Supported document formats are JSON, HTML, and XML
+	3. Consistency Models
+		Eventually consistent
+		Strongly consistent
+		DynamoDB transactions
+	4. DynamoDB Features - Consists of tables, items, and attributes.
+	5. Types of Primary Key
+		Partition key 
+		Composite key (partition key + sort key)
+=================
+Controlling Access to DynamoDB
+	1. IAM - Authentication and access control is managed using AWS IAM.
+	2. IAM Permissions - You can create IAM users within your AWS account with specific permissions to access and create DynamoDB tables.
+	3. IAM Roles - You can also create IAM roles, enabling temporary access to DynamoDB.
+-----------------
+Restricting User Access
+	You can also use a special 'IAM condition' to restrict user access to only their own records.
+-----------------
+DynamoDB Access Control - Exam Tips
+	Fine-Grained Access Control IAM.
+	IAM condition parameter 'dynamodb:LeadingKeys' allows users to access only the items where the partition key value matches their User_ID
+----------------
+Understanding DynamoDB Secondary Indexes
+    Flexible Querying
+        'Query based on an attribute that is not the primary key.'
+	DynamoDB allows cyou to run a query on non-primary key attribute using 'global secondary indexes' and 'local secondary indexes'
+	A secondary index allows you to perform fast queries on specific columns in a table. You select the columns that you want included in the index
+	and run your searches on the index, rather than on the entire dataset
+---------------
+Local Secondary Index
+	1. Primary key - Same partition key as your original table but a different sort kay.
+	2. A Different View - Gives you a different view of your data, organized according to an alternative sort key
+	3. Faster Queries - Any queries based on this sort key are much faster using the index than the main table
+	4. An Example 
+		Partition key : user ID
+		Sort key: account creation date
+	5. Add at Creation time - can only be created when you are creating your table. you cannot add, remove, or modify it later
+---------------
+Global Secondary Index
+	1. A Completely Different Primary Key - Different partition key and sort key.
+	2. View Your Data Differently - Gives a completely different view of the data.
+	3. Speed up Queries - Speeds up any queries relating to this alternative partition and sort key
+	4. An Example 
+		Partition Key : email address
+		Sort key : last log in date
+	5. Flexible - You can create when you create your table, or add it later.
+---------------
+Differences:
+	Local Secondary Index
+		Same partition key and different sort key to your table
+		Must be created when you create your table
+	Global Secondary Index
+		Different partition key and different sort key to your table.
+		Can be created any time.
+===============
+Scan vs Query 
+	What is a query? 
+		A query finds items in a table based on the 'primary key' attribute and a distinct 'value' to search for.
+---------------
+Refine Your Query
+	Use an optional sort key name and value to refine the results.
+	For example, if your sort key is a 'timestamp', you can refine the query to 'only select' items with a 'timestamp' of the last 7 days.
+---------------
+What is a Query ?
+	By default, a query returns all the attributes for the items you select, but you can use the 'ProjectionExpression' patameter 
+	if you want to only return the specific attributes you want (e.g. If you only want to see the email address rather than all the attributes)
+---------------
+	Sort key - Results are always sorted by the sort key.
+	Numeric Order - In ascending numeric order by default (e.g. 1,2,3,4).
+	ASCII - ASCII character code values
+	Reverse The Order - You can reverse the order by setting the 'ScanIndexForward' parameter to false
+	Eventually yConsistent - By default, queries are eventually consistent.
+	Strongly Consistent - You need to explicitly set the query to be strongly consistent.
+----------------
+What is a SCAN ? 
+	A scan examines every item in the table. By default, it returns all data attributes.
+
+	Use the 'ProjectionExpression' parameter to refine the scan to only return the attributes you want 
+		(e.g. if you only want to see the email address rather than all the attributes)	
+---------------
+Query or Scan ?
+	1. Query Is More Efficient Than a Scan 
+		A scan dumps the entire table and filters out the values to provide the desired result, removing the unwanted data.
+	2. Extra Step 
+		Adds an extra step of removing the data you don't want. As the table grows, the scan operation takes longer.
+	3. Provisioned Throughput
+		A scan operation on a large table can use up the provisioned throughput for a large table in just a single operation
+---------------
+How to improve Scan performance ? 
+	Sequental by Default - a scan operation processes data sequentially, returning 1MB increments  before moving on to retrieve the next 1MB of data.
+				Scans one partition at a time
+	Beware - It is best to avoid parallel scans if your table or index is already including heavy read or write activity from other application.
+	Parallel Is Possible - You can configure DynamoDB to use parallel scans instead by logically dividinga table or index into segments 
+				and scanning each segment in parallel
+---------------
+	Isolate scan operations to specific tables and segregate them from your mission-critical traffic.
+	Even if that means writing data to 2 different tables.
+---------------
+	Improving Performance.
+		Set a 'smaller page size'  (e.g. set the page size to return 40 items).
+		Running a larger number of 'smaller operations' will allow other requests to succeed without throttling
+	AVOID SCANS!
+		Avoid using scan operations if you can.
+		Design tables in a way that you can use the 'Query, Get or BatchGetitem' APIs
+--------------
+Scan vs Query Exam Tips
+	A scan operation examines every item in the table and by default returns all data attributes.
+	'For queries and scans, use the ProjectionExpression parameter to refine the results.'
+
+	Query - Finds Items in a table - Using only the primary key attribute, you provide the primary key name and a distinct value to search for.
+	Results - Sort Key - Query results are always sorted in ascending order by the sort key if there is one.
+	Reverse - Set 'ScanIndexForward' parameter to false - This reverses the order of query results.
+--------------
+Reduce the impact of a query or scan by setting a smaller page size.
+'Isolate scan operations to specific table'
+Try parallel scans rather than the default sequential scan.
+A query operation is generally more efficient than a scan
+Design tables in a way that you can use the 'Query, Get, BatchGetItem' APIs.
+=================
+Using DynamoDB API Calls
+	We can use API calls to programmatically interact with our DynamoDB table (e.g. to query delete or add items)
+	When we use the AWS CLI to run the get-item command, we are interracting with the DYnamoDB GetItem API.
+-----------------
+AWS CLI COMMANDS
+	create-table, put-item, get-item, update-item, update-table, list-table, describe-table, scan, query, delete-table, delete-item
+-----------------
+You should understand what they are used for at a 'high level', understand the 'differences' between them, and be aware that the user 
+must have the correct 'IAM permissions'
+
+commands reference : 'https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodb/index.html'
+-----------------
+Exam Tips
+	Know how to use each of the common commands listed in this lesson.
+	The CLI commands are making calls to a DynamoDB API
+	The correct IAM permissions are required to make an API call.
+=================
+DymnamoDB Provisioned Throughput - Measured in Capacity Units
+	Specify Requirements - When you create table, you can specify your requirements in terms of read capacity units and write capacity units
+	Write Capacity units - 1 x write capacity unit - 1 x 1KB write per second
+	Read Capacity Units - 1 x read capacity unit = 1 x strongly consistent read of 4KB per second (default)
+-----------------
+Strongly consistent read example : (4KB read block)
+	we need 80 items every = 3KB - how many read capacity units i need
+		3KB / 4KB(1 read block) = 0.75 ~ i need 1 block for every item
+		i need = 80 capacity units 
+----------------
+Eventually consistent read example : (2x4KB read block)
+        we need 80 items every = 3KB - how many read capacity units i need
+	 3KB / 4KB(1 read block) = 0.75 ~ i need 1 block for every item
+ 	i need = 80 capacity units (Strong cr)
+	80/2 = 40 Capacity units  (Eventually cr)
+----------------
+write capacity units example:
+	we need to write 100 items/sec each = 512 bytes - how many write CU i need 
+	each item = 512 bytes = i need 1 KB block for every item
+	1*100 = 100 wcu - i need 100 write capacity units 
+----------------
+Exam tips
+	Write Capacity Unit - 1block*1kb write per second
+	Strongly COnsistent read - 1block*4KB read per second 
+	EventuallyConsistent Reads - 2blocks*4KB reads per second
+================
+DynamoDB  On-Demand Capacity
+	Charges apply for reading, writing, and storing data.
+	DynamoDB instantly scales up and down based on the activity of your application.
+	
+	Great for : 
+		Unpredictable workloads
+		New application where you don't know the use pattern yet.
+		When you want to pay for only what you use (pay per request)
+----------------
+On-Demand Capacity VS Provisioned Capacity
+    On-Demand :
+	Unknown workloads.
+	Unpredictable application traffic.
+	Spiky, short-lived peaks
+	A pay-per-use model is desired
+	It might be more difficult to predict the cost
+    Provisioned Capacity
+	Read and write capacity requirements can be forecasted
+	Predictable application traffic
+	Application traffic is consistent or increases gradually
+	You have more control over the cost
+----------------
+Exam Tips 
+	Understand the difference - Know when to use each pricing model
+	On-Demand Capacity - 
+	    Unpredictable application traffic
+	    Pay-per-use model
+	Provisioned Capacity
+	    Read and Write capacity requirements can be forecasted
+	    Application traffic is consistent or increases gradually
+================
+DynamoDB Accelerator (DAX)
+	DAX - is a fully managed, clustered in-memory cache for DynamoDB
+	Delivers up to a 10x read performance improvement. Microsecond performance for millions of requests per second.
+----------------
+Read-Heavy Workloads
+	Ideal for read-heavy and bursty workloads like auction applications, gaming, and retail sites during Black Friday promotion
+----------------
+DAX is a write-through caching service. Data is written to the cache and backend store at same time.
+this allows you to point your DynamoDB API calls at the DAX cluster.
+request searching for result in cache first.
+if no in cache - DAX makes eventually consistent read (GetItem) in DynamoDB
+----------------
+DAX - reduces the read load on DynamoDB tables
+	may be able to reduce provisioned read capacity on your table and save money on your AWS bill.
+----------------
+What is DAX Not Suitable?
+	Caters for eventually consistent reads only
+	Not suitable for applications that require strongly consistent reads
+
+	Not Suitable for: 
+		Applications which are mainly write-intensive
+		Applications that do not perform many read operations
+		Applications that do not require microseconds response times
+------------------
+Exam tips:
+	In-Memory Cache - provides in-memory caching for DynamoDB tables
+	Improves Response - Improves response times for eventually consistent reads only
+	Write Operations - Data is writen to the cache and the backend store at the same time.
+	API Calls - You point your API calls at the DAX cluster instead of your table
+	Cache Hit - If the item you are quering is in cache, DAX will return it.
+	Not Suitable - Not suitable for write-intensive applications or applications that require strongly consistent reads.
+==================
+DynamoDB TTL 
+	Defines an expiry time for your data.
+	Expired items marked for deletion.
+	Great for 'removing irrelevant or old data' (e.g. session data, event logs, and temporary data).
+	'Reduces the cost' of your table by automatically removing data which is no longer relevant.
+	TTL = Epoch Time - seconds from 01.01.1970
+	When the current time is greater than the TTL, the item will be expired and marked for deletion.
+	You can filter out expired items from your queries and scans
+------------------
+Exam Tips
+	TTL - Defines an expiry time for your data. Once expired, an item is marked for deletion
+	Use Cases - Great for removing irrelevant or old data, (e.g., session data, event logs, and temporary data)
+	Helps You Save Money - Reduces the cost of your table by automatically removing data which is no longer relevant
+==================
+DynamoDB Streams
+	Time Ordered Sequence - Time ordered sequence of item level modifications (e.g. insert, update, delete)
+	Logs - Encrypted at rest and stored for 24 hours
+	Dedicated Endpoint - Accessed using a dedicated endpoint.
+	Primary Key - By default, the primary key is recorded.
+	Images - Before and after images can be captured.
+	Use Cases - Audit or archive transactions, trigger an event based on a particular transaction, or replicate data across multiple tables.
+-----------------
+An Event Source for Lambda
+	Near Real-Time
+		Applications can take actions based on contents of the stream.
+		A DynamoDB Stream can be an event source for Lambda.
+		Lambda polls the DynamoDB streams and executes based on an event
+----------------
+Exam Tips 
+	Sequence of Modifications - DynamoDB Streams is a time-ordered sequence of item level modifications in your DynamoDB tables.
+	Encrypted and stored  - Data is stored for 24 hours only
+	Lambda Event Source - Can be used as an event source for Lambda , so you can create applications that take actions 
+				based on events in your DynamoDB table
+=================
+Provisioned Throughput and Exponential Backoff
+	Provisioned Throughput Exceeded
+	1. ProvisionedThroughputExceededException - YOur request rate is too high for the read/write capacity provisioned on your DynamoDB table
+	2. Using the AWS SDK ? - The SDK will automatically retry the requests untill successful.
+	3. Not Using the AWS SDK? - Reduce your request frequency. Use 'exponential backoff'.
+----------------
+Overloaded Components 
+	In addition to simple retries, all AWS SDK's use exponential backoff.
+	Uses 'progressively longer waits' between consecutive retries, for 'improved flow control'.
+	
+	Example: 
+		first request failled
+		wait 50ms
+		second request failled
+		wait 100ms
+		threed request failled
+		wait 200ms
+		if after 1 min this doesn't work, your request size may be exceeding the throughput your read/write capacity.
+-----------------
+Exam Tips
+	1. ProvisionedThroughputExceededException - error means the number of requests is too high
+	2. Better Flow Control - Exponential backoff improves flow by retrying requests using progressively longer waits.
+	3. Every AWS SDK - Exponential backoff is a feature of every AWS SDK (e.g. S3 buckets, CloudFormation, SES).
+=================
+
+	
+
+	
+	
+
+
+
+	
+  
+	
+ 
+
+	
+
+
+
+
+
+
+	
+ 
+	
+
+
+
+ 
+
+
+
+
+
+	
+
+
+	
+
+
+
+

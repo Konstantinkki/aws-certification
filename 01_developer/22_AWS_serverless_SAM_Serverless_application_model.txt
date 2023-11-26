@@ -1,0 +1,175 @@
+AWS SAM
+	SAM = Serverless Application Model
+	Framework for developing  and deploying serverless applications
+	All the configuration is YAML code
+	Generate complex CloudFormation from simple SAM YAML file
+	Supports anything from CloudFormation: Outputs, Mappings, Parameters, Resources...
+	Only two commands to deploy to AWS 
+	SAM can use CodeDeploy to deploy Lambda functions
+	SAM can help you to run Lambda, API GAteway, DynamoDB locally
+----------------------------------------------------------------------------------------------
+AWS SAM Recipe
+	Transform Header indicates it's SAM template:
+		Transform: 'AWS::Serverless-2016-10-31'
+	Write Code 
+		AWS::Serverless::Function
+		AWS::Serverless::Api
+		AWS::Serverless::SimpleTable
+	PAckage & Deploy:
+		aws cloudformation package/sam package
+		aws cloudformation deploy/sam deploy
+----------------------------------------------------------------------------------------------
+Deep Dive into SAM Deployment
+
+                            build applocally                        Package the Application                       Deploy the app
+                              (sam build)                           (sam package OR AWS CF package)        (sam deploy OR aws CF deploy)
+
+	SAM Template(YAML)-----transform--------> CloudFormation --------------zip & upload---------->S3--create & execute ChangeSet--------CloudFormation
+	      +                                    Template(YAML)                                                                               |
+	Application Code                                 +                                                                                      |
+	                                           Application Code                                                                 CF Stack :
+	                                                                                                                              Lambda, API GW, DynamoDB
+----------------------------------------------------------------------------------------------
+SAM CLI Debugging
+	Locally build, test, and debug your serverless applications that are defined using AWS SAM template
+	Provides a lambda -like  execution environment locally
+	SAM CLI + AWS Toolkit => step through and debug your code
+	Supported IDE's: AWS Cloud9, VS Code, JetBrains, intellij ...
+	AWS Toolkits: IDE plugins which allows you to build, test, debug, deploy, and invoke Lambda functions built using AWS SAM
+==================================================================================================
+SAM Policy Templates
+	List of templates to apply permissions to your Lambda Functions
+	Full list available here:
+	https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html#serverless-policy-template-table
+	Important example:
+		S3ReadPolicy: Gives read only permissions to objects in S3
+		SQSPollerPolicy: Allows to pull an SQS queue 
+		DynamoDBCrudPolicy : CRUD 
+
+MyFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+	CodeUri: ${codeuri}
+	Handler: hello.handler
+	Runtime: python2.7
+	Policies:
+	    - SQSPollerPolicy:
+		QueueName:
+		    !GetAtt MyQueue.QueueName
+
+===================================================================================================
+SAM and CodeDeploy
+	SAM framework natively uses CodeDeploy to update Lambda functions
+	Traffic Shifting features
+	Pre and Post traffic hooks features to validate deployment(before the traffic shift starts and after it ands)
+	Easy & automated rollback using CloudWatch Alarms
+
+	AutoPublishAlias
+		Detects when new code is being deployed
+		Creates and publishes an updated version of that function with the latest code
+		Points the alias to the updated version of the Lambda function
+	DeploymentPreference
+		Canary, Linear, AllAtOnce
+	Alarms
+		Alarms that can trigger a rollback
+	Hooks
+		Pre and post traffic shifting Lambda fucntions to test your deployment
+==========================================================================================================
+SAM Local Capabilities
+	Local start AWS Lambda
+		'sam local start-lambda'
+		Start a local endpoint that emulates AWS Lambda
+		Can run automated tests against this loacl endpoint
+
+	Locally Invoke Lambda Function
+		'sam local invoke'
+		Invoke Lambda function with payload once and quit after invocation completes
+		Helpfull for generating test cases
+		If the function make API calls to AWS, make sure you are using the correct --profile option
+
+	Locally Start an API Gateway  Endpoint
+		'sam local start-api'
+		starts local HTTP server that hosts all your functions
+		Changes to functions are automatically reload
+
+	Generate AWS Events for Lambda Functions
+		'sam local generate-event' 
+		Generate sample payloads for event sources
+		S3, API GW, SNS, Kinesis, DynamoDB...
+===========================================================================================================
+SAM - Exam Summary
+	SAM is built on CloudFormation
+	SAM requires the 'Transform' and 'Resources' section
+	Commands to know : 
+		sam build: fetch depemdencies and create local deployment artifacts
+		sam package: package and upload to Amazon S3, generate CF template
+		sam deploy: deploy to CloudFormation
+	SAM Policy templates for easy IAM policy definition
+	SAM is integrated with CodeDeploy to do deploy to Lambda aliaces
+===========================================================================================================
+Serverless Application Repository (SAR)
+	Managed repository for serverless applications
+	The applications are packaged using SAM
+	Build and publish applications that can be re-used by organizations
+		Can share publicy
+		Can share with specific AWS accounts
+	This prevents duplicate work, and just go straight to publishing
+	Application settings and behaviour can be customized using Environment variables
+========================================================================================================
+CDK Testing 
+	To test CDK apps, use CDK Assertion Module combined with popular test frameworks such as Jest(JS), or Pytest(Python)
+	Verify we have specific resources, rules, conditions, parameters ...
+	Two types of tests: 
+		Fine-grained Assertion (common) - test specific aspect of the CF. template(e.g. check if a resource has this property with this value)
+		Snapshot Tests - test the synchronized CloudFormation template against a previously stored baseline template
+	To import a template
+		Template.fromStack(MyStack): stack built in CDK
+		Template.fromString(mystring): stack build outside CDK
+
+describe("StateMachineStack", ()=>{
+tets("synthesizes the the way we expect", ()=>{
+...
+//Prepare the stack for assertations
+const tamplate = Template.fromStack(myStack);
+
+
+//Assert it creates lambda with correct properties...
+template.hasResourceProperties("AWS::Lambda::Function", {
+Handler: "handler",
+Runtime:"nodejs14.x"                                FINE GRAINED ASSERTATION
+})
+template.resourceCountIs("AWS::SNS::Subscription", 1)
+
+
+//----    SNAPSHOT TEST
+//Assert the synthesized CF template against a previously stored baseline template
+expect(template.toJSON()).toMatchSnapshot();
+
+
+
+})
+
+
+}) 
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

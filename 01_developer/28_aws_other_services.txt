@@ -1,0 +1,106 @@
+AWS SES - Simple Email Service
+	Send emails to people using:
+		SMTP interface
+		Or AWS SDK
+	Ability to receive email. Integrates with :
+		S3
+		SNS
+		Lambda
+
+	Integrated with IAM for allowing to send emails
+=================================================================     ,
+Amazon OpenSearch Service
+	Amazon OpenSearch is successor to Amazon ElasticSearch
+	In DynamoDB, queries only exist by primary key ot indexes...
+	With OpenSearch you can search any field, even partially matches
+	It's common to use OpenSearch  as a compliment to another database
+	Two modes: managed cluster or serverless cluster
+	Does not natively support SQL (can be enabled via a plugin)
+	Ingestion from Kinesis Data Firehose, AWS IoT, and CloudWatch Logs
+	Security through Cognito & IAM KMS encryption, TLS
+	Comes with OpenSearch Dashboards(visualization)
+======================================================================
+Amazon Athena
+	Serverless query service to analize data stored in Amazon S3
+	Uses standard SQL Language to query the files (build on Presto)
+	Supports CSV, JSON, ORC, Avro, and Parquet
+	Pricing $5 per TB of data scanned
+	Commonly used with Amazon Quicksight for reporting/dashboards
+
+	Use cases: Business intelligence/ analytics / reporting, analize & query VPC Flow Logs, ELB Logs, CloudTrial trails, etc...
+	Exam Tip: analize data in S3 using serverless SQL, = use Athena
+------------------------------------------------------------------------
+Amazon Athena - Performance Improvement
+	Use columnar data for cost-saving (less scan)
+		Apache Parquet or ORC is recommended
+		Huge performance improvement
+		Use Glue to convert your data to Parquet or ORC
+	Compress data for smaller retrievals (bzip2, gzip, lz4, snappy, zlip, zstd)
+	Partition databases in S3 for easy quering on virtual columns
+		s3://myBucket/pathToTable
+			/<PARTITION_COLUMN_NAME>=<VALUE>
+			    /<PARTITION_COLUMN_NAME>=<VALUE>
+				/<PARTITION_COLUMN_NAME>=<VALUE>
+				   /etc
+		Example: s3://athena-examples/flight/parquet/year=1991/month=1/day=1/
+	Use largEr files(>128 MB) to minimize overhead
+---------------------------------------------------------------------------
+Amazon Athena - Federated Query
+	Allows you to run SQL queries across data stored in relational, non-relational  object and custom data sources (AWS or on-permises)
+	Uses Data Source Connectors that run on AWS Lambda to run Federated Queries(e.g. CloudWatch Logs, DynamoDB, RDS, ...)
+	Store the result back in Amazon S3
+==============================================================================
+Amazon Managed Streamingfor Apache Kafka (Amaon MSK)
+	Alternative to Anazon Kinesis
+	Fully managed Apache Kafka on AWS
+		Allow you to create update delete clusters
+		MSK creates and manages Kafka brokers nodes & zookeeper nodes fot you
+		Deploy the MSK cluster in your VPC, multi-AZ(up to 3 for HA)
+		Automatic recovery from common Apache Kafka failures
+		Data is stored on EBS volumes for as long as you want
+	MSK Serverless
+		Run Apache Kafka on MSK without managing the capacity
+		MSK automatically provisions resources and scales compute & storage
+==============================================================================
+AWS Certificate Manager (ACM)
+	Let's you easily provision, manage, and deploy SSL/TLS Certificates
+	Used for provide in-flight encryption for websites (HTTPS)
+	Supports both public and private TLS certificates
+	Free of charge for public TLS certificates
+	Automatic TLS certificate renewal 
+	Integration with (load TLS certificates on)
+		Elastic Load Balancers
+		CloudFront Destributions
+		APIs on API Gateway
+=====================================================================================
+AWS AooConfig
+	Configure, validate and deploy dynamic configuratuins
+	Deploy dynamic configuration changes to your applicationsindependently of any code deployments
+		you don't need to restart the application
+	Feature flags, application tuning, allow/block listing...
+	Use with apps on EC2 instances, Lambda, ECS, EKS...
+	Gradually deploy the configuration changes and rollback if issues occur
+	Validate configuration changes before deployment using:
+		JSON Schema (syntactic check) or 
+		Lambda Function - run code to perform validation (semantic check)
+==============================================================================================
+CloudWatch Evidently
+	Safely validate new features by serving them to a specified % of your users
+		Reduce risk and identify unintended consequences
+		Collect experiment data, analyze using stats, monitor performance
+	Launches (= feature flags): enable and disable features for a subset of users
+	Experiments (=A/B testing) : compare multiple versions of the same feature
+	Overrides: ore-define a variation for a specific user 
+	Store evaluation events in CloudWatch Logs or S3
+=================================================================================================
+	
+
+
+
+
+
+ 
+
+
+
+

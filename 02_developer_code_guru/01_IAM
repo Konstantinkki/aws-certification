@@ -1,0 +1,39 @@
+IAM : 
+	Centralized - Control of your AWS account
+	Access- Shared access to your AWS Account
+	Permissions - Granular permissions
+	Identity Federation - Supports well-known identity providers such as: Active Directory, Facebook and Linkedin
+---------------------------
+IAM : 
+	1. MFA - Provides Increased security for your AWS account settings and resources
+	2. Temporary Access - Provides Temporary access for users/devices and services, as necessary
+	3. Password Policies - Allows you to setup your own password rotation policy
+	4. Integrated - Integrates with many different AWS services.
+	5. Compliance - Supports PCI DSS compliance
+-------------------------
+
+Users - End USers - think people
+Groups - A collection of users under one set of permissions
+Roles - yoy create roles and can then assign them to users, applications, and services to give access to AWS resources.
+---------------------------
+IAM POLICY 
+	A document that defines one or more permissions.
+	An IAM policy can be attached to a user, group or role
+=============================
+test permissions
+	https://policysim.aws.amazon.com/
+===============================
+IAM Access Keys - Exam Tips
+	AccessKeys - New Users are assigned an access key ID and secret access key when their accounts are created
+	Not For Console Access - These are not the same as a password and you cannot use the access key ID or secret access key to log in to the AWS UI Console
+	Programmic Access - You can use access keys to access AWS via APIs and command line
+
+---------------------------------
+Viewing Access Keys - You only get to view the access key ID and secret access key once, If you lose them, you have to regenerate them. 
+			Make sure to save them in a secure location
+Use MFA - Always set up Multi-Factor Authentication(MFA) on your root account
+Password Rotation - You can create and customize your own password rotation policies.
+==============================================================================================
+
+
+

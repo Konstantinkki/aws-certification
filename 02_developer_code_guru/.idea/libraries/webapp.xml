@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="webapp">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/course-aws-certified-developer-associate/Code_Deploy_Demo/webapp.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

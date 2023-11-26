@@ -1,0 +1,50 @@
+Web Identity Federation - Simplifies authentication and authorization for web applications
+1. User Access to AWS Resources - Users access AWS resources after successfully authenticating with a web-based identity provider like Facebook, Amazon or Google
+2. Authentication - Following successful authentication, users receive an authentication code from the web ID provider
+3. Authorization - Users can trade this authentication code for temporary AWS security credentials, authorizing accesss to AWS resources.
+------------------
+Web ID Federation with Amazon Cognito
+1. Amazon Cognito - provides web ID federation, including sign-up and sign-in functionality for your applications, and access for guest users.
+2. Identity Broker - Manages authentication between your application and web ID providers, so you don't need to write any additional code.
+3. Multiple Devices - Synchronizes user data for multiple devices.
+4. Recommended for Mobile - Recommended for all mobile applications that call AWS services
+------------------
+Amazon Cognito Use Case
+	Web Identity Federation Using Social Media Accounts like Facebook
+	1. app asks FB for token
+	2. app sends token to Cognito
+	3. cognito makes temp token for access to AWS resources
+-----------------
+Authentication with Amazon cognito
+1. Temporary Credentials - Cognito brokes between the app and FB, Amazon or Google to provide temporary credentials
+2. IAM Role - The temporary credentials map to an IAM role, allowing access to the required resources.
+3. Secure and Seamless - No need for the app to embed or store AWS credentials locally on the device. Cognito gives users seamless experience across all devices.
+-----------------
+Cognito User Pools and Identity Pools
+	1. User Pools - User directories uses to manage sign-up and sign-in functionality for mobile and web apps.
+	2. Sign-in - Users can sign-in directly to the User Pool, or using Facebook, Amazon or Google
+	3. Identity Pools - Identity pools enable you to provide temporary AWS credentials. Enabling access to AWS services like S3 or DynamoDB.
+-----------------
+Amazon Cognito User Pool and Identity PoolWorkflow
+	1. User ---> User Pool ----> Facebook
+	2. user get JWT tocken
+	3. User = JWT Token ----> Identity Pool
+	4. User get AWS Credentials  - creds map to IAM Role
+	5. User get access to aws resources.
+-----------------
+Cognito Push Synchronization - Synchronization Across Devices
+	1. Devices - Cognito tracks the association between user identity and the various different devices they sign-in from.
+	2. Seamless - Cognito uses push Synchronization to push updates and synchronize user data across multople devices.
+	3. SNS Silent Notification - SNS notification to all the devices associated with a given user identity whenever data stored in the cloud changes.
+-----------------
+Web Identity Federation  Exam Tips
+	Allows users authenticate with a web identity provider like Google, Facebook or Amazon
+
+	An authentication token (JWT token) is exchanged for temporary AWS credentials, allowing users to assume an IAM role, with permission to access AWS resources.
+
+-----------------
+
+
+
+
+

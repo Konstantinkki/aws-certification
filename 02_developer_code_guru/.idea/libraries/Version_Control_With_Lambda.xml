@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Version_Control_With_Lambda">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/course-aws-certified-developer-associate/Version_Control_With_Lambda/Version2.zip!/" />
+      <root url="jar://$PROJECT_DIR$/course-aws-certified-developer-associate/Version_Control_With_Lambda/Version1.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
