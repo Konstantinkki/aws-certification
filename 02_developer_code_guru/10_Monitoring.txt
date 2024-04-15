@@ -1,0 +1,282 @@
+Introducing to cloudwatch
+---------------------------
+What is cloudwatch ?
+	Amazon CloudWatch is a monitoring service to monitor the health and performance of your AWS resources, as well as the applications that you 
+		run on AWS, and in your own datacenter.
+-----------
+What Can CloudWatch Monitor? (almost everything)
+1. Compute 
+	Ec2. ASG, ELB, route53 health checks, Lambda
+2. Storage & Content Delivery
+	EBS volumes, Storage Gateway, CloudFront
+3. Database & Analytics
+	DynamoDB Tables, ElastiCache nodes, RDS instances, Redshift, Elastic Map Reduce
+4. Other 
+	SNS topics, SQS queues, API Gateway, Estimated AWS charges
+--------------
+The CloudWatch Agent - define your own metrics.
+	CloudWatch Logs allows you to monitor operating system and application logs.
+--------------
+Cloudwatch and ec2
+	All EC2 instances send key health and performance metrics to CloudWatch.
+	Default EC2 host-level metrics consists of : CPU, network, disk, and status checks.
+	Metrics are stored indefinitely.
+	You can retrive data from any EC2 or ELB instance even after it has been terminated
+--------------
+Operating System-Level Metrics
+	1. By Default - EC2 does not send operating system-level metrics to CloudWatch 
+	2. CloudWatch Agent - By installing the CloudWatch agent on your EC2 instances, you can collect operating system metrics and send them to CloudWatch.
+	3. Operating System Metrics - Memory usage, processes running on your instance, amount of free disk space, CPU idle time, etc
+-------------
+Metric Frequency 
+	'By default, EC2 sends metric data to CloudWatch in 5-minute intervals'
+	For an additional charge you can enable detailed monitoring that sends metrics at 1minute intervals.
+	For custom metrics, the default is 1-minute intervals, and you can configure high resolution metrics that are sent at 1 second intervals.
+-------------
+Monitoring System and Application Logs 
+	1. Monitor Log Files - Monitor and troubleshoot your applications using existing system and application log files.
+	2. Customize For Your Application - Monitor your logs in near-real time for specific phrases, values or patterns. Requires the CloudWatch agent.
+	3. Use Case - Track the number of errors that occur your application log and send yourself a notification whenever the rate 
+		of errors exceeds a threshold you specify.
+-------------
+CloudWatch Alarms - you can create an alarm to monitor any Amazon CloudWatch metric in your account.
+1. Alarms - This can include EC2 CPU utilization, Elastic Load Balancer latency, or even the charges on your AWS bill.
+2. Threshholds - You can set appropriate threshholds to trigger the alarms and actions to be taken if an alarm state is reached .
+3. Use Case - You can set an alarm that seconds you a notification or executes an Auto Scaling policy if CPU utilization exceeds 90% 
+	on your EC2 instance for more than 5 min. 
+-------------
+Exam Summary
+1. Launch an EC2 instance - Attach an IAM role with permissions to send CW Agent metrics to CW
+2. Install CW Agent - Configure the agent to send operating system metrics and logs to CW
+3. View Metrics in CW - We should be able to see the EC2 default metrics as well as the metrics and logs send by the CW Agent
+-------------
+Understanding CloudWatch Concept 
+	Cloudwatch Metrics
+	CLoudwatch Namespaces
+	CW Dimensions
+	CW Dashboards
+	Exam Tips
+-------------
+CW Metrics 
+	A metric is a variable to monitor.
+	Metrics are uniquely defined by a 'name' a 'namespace', and zero or more 'dimensions'.
+	1. Sequence - Time-ordered sequence of 'values' or 'data points' which are published to CW
+	2. Timestamp - Each 'data point' in a metric has a 'timestamp', and optionally, a unit of measurement
+	3. Example - The 'CPU usage' of an 'EC2' instance.
+-------------
+A namespace is a 'container' for CW 'metrics' (e.g. EC2 uses the AWS/EC2 namespace). Create your own namespace to publish 'custom metric' data
+1. Specify - You must specify a namespace for 'each data point or value' that you publish to CW
+2. Create - Specify the namespace name when you 'create' a metric
+3. Isolated - Metrics in 'different' namespaces are 'isolated' from each other.
+4. Not Aggregated - Metrics from different applications are 'not aggregated' into the same statistics.
+-------------
+CloudWatch Dimension - A dimension is like filter
+1. Name/Value pair can be used to filter cloudWatch data
+2. InstanceId - Use the 'instanceid' dimension to search for metrics relating to a specific EC2 instance
+3. Aggregate - CW can 'aggregate' data across dimension for some services(e.g. EC2)
+-------------
+If you search for CPU metrics in the 'AWS/EC2' namespacewithout specifying a dimension, CW can provide 'aggregate' data (e.g. across all instances)
+If we specify a 'dimension' of our 'instanceId', CW will show you the CPU metrics related to that instanceid
+-------------
+CW Dashboards
+'A custon view, like a home page that you create in CW'
+'A single page for monitoring your resources'
+*You can create a CW dashboard to display important metrics for all your production syatems in one place.
+This allows you to check the health of your critical systems and applications from one dashboard. Simpley select the metrics that are important to you,
+	and add them to your dashboard.
+--------------
+Understanding CW Concept - Exam Tips
+1. CW Metrics - A metric is a 'variable to monitor' (e.g. CPU usage of an EC2 instance)
+2. CW Namespace - A namespace is a 'container' for CW 'metrics' (e.g. EC2 uses the AWS/EC2 namespace)
+3. CW Dimensions - A dimensio is a like a 'filter' (e.g. use the 'instanceid' dimension to search for metrics related to a specific EC2 instance)
+4. CW Dashboards - A dashboard is like 'custom home page' that you create in CW (e.g display 'important metrics' for all of your production systems 'in 1 place')
+==============
+CW vs CloudTrail
+  CT - records user activity in your AWS accounts
+  CT - records events related to creation, modification, or deletion of resources (such as IAM users, S3 buckets, and EC2 instances).
+  By Defauilt, you can view the last 90 days of account activity
+--------------
+CW : 
+	1. Performance and metrics
+	2. CW Logs
+	3. CW Alarms
+CT:
+	1. Records API calls for your AWS account
+	2. Delivers log files containing API calls to an S3 bucket.
+	3. Can be integrated with CW logs
+Understand the difference
+	1. Do you need to monitor the performance of AWS resources? - CW
+	2. DO you need an audit log of user activity in your AWS account ? - CT
+=================
+Using CW Actions
+	What are CW Actions?
+	PutMetricsData
+	PutMetricsAlarm
+	Example
+	ExamTips
+-----------------
+The CW API 'SUpports a long list of different actions.'
+	These 'actions' allows you to 'publish', 'monitor', and 'alert' on a varietly of metrics.
+	These are particylarly powerful when creating custom metrics for 'monitoring and alert' for your application.
+
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_Operations.html
+----------------
+PutMetricData - Publishes metric data points to CW.
+	You can define the name of metric, the namespace to publish to, the value to publish, and a timestamp for the data point.
+	After running thois command, this metric will become visible in CW.
+----------------
+PutMetricAlarm - Creates an 'alarm' associated with a 'metric' to 'alert' you if a 'threshold' has been reached.
+	For example, you want to be alertrd if the average PageViewCount exceeds a threshold of 50 within a time period of 5 min
+================
+CW Logs Insights
+	Interactive query qnd analysis.
+	'For data stored in CW Logs'
+	Bespoke query language
+	Query and filter the logs directly
+	Generate visualizations, e.g. bar graph, line graph, or pie chat
+---------------
+Lesson Objectives
+	1. Create a Basic Lambda Function - a new log group is automatically created, enabling it to send logs to CW
+	2. Test - Test that our function is working, which will generate some log events.
+	3. Explore CW Logs Insights - Explore how we can use yCW Logs Insights to analyze our log data
+	4. Review some of the sample queries that are available.
+---------------
+Exam Tips:
+	1. Query and Analyze - We can use CW Logs insights to interactively query and analyze data stored in CW Logs.
+	2. Visualizations - Query the logs directly and also generate visualizations, e.g. bar graph, line graph, pie chart, etc.
+	3. Examples - Display the 25 most recently added log events. 
+			Search VPC flow logs to find out which IP addresses are using a specific protocol.
+			Find the most expensive Lambda  requests.
+==============
+Receiving Notifications with CW - Demo
+	
+	1. Launch an EC2 Instance - Enable detailed monitoring at 1-min intervals.
+	2. Create a CW Alarm - The Alarm will trigger if CPU utilization  exceeds 90% for 1 min.
+	3. Configure an Email Alert - Configure CW to alert us by sending an email using SNS if the alarm is triggered.
+	4. Max Out Our CPU - Run a command to max out our CPU. This should cause the CW alarm to trigger, and if our alert is working, we'll also receive an email.
+===============
+What is EventBridge?
+Schedule Events
+Sound like CW events ?
+EventBridge Use Cases
+Exam Tips
+----------------
+What is EBridge ?
+	EventBridge is all about 'event-driven architecture' An event is a change in state
+
+Example : 
+	AWS Config  ====events===>              ==Rules -> Target ===action===> EC2
+	CloudTrial  ====events===>  EventBridge ==Rules -> Target ===action===> Lambda
+	CloudWatch  ====events===>              ==Rules -> Target ===action===> SNS
+----------------
+Event Bridge may be used for schedure events
+	EventBridge rules can also run on a schedule.
+	e.g. Once an hour or day, or using a cron expression, we can set a rule to run at the same time on a specified day, week, or month.
+---------------
+Sound like CW Events?
+	EventBridge is the 'preferred way' to manage your events
+	CW Events and EB are the 'same underlying services' and API,  but EB provides more features.
+	Changes you maake in rither CW or EB will 'appear in each console'  
+--------------
+EventBridge Use Case: 
+	You company requires that all EC2 instances have encrypted disks.
+	AWS Config detects that somebody has created a new instance without encrypting the attached EBS volumes.
+	An Event is generated and sent to EventBlidge, which triggers a rule that invokes an action to send you an email using SNS
+
+example 2
+	CW detects that one of EC2 instances is showing CPU utilization of 99%
+	AN event is generated and sent to Eventbridge, which triggers a rule that invokes an action to send you an email using SNS.
+
+	The same underlying technology as CW Events
+--------------
+Exam Tips
+	EB - Allows you to easily configure 'event-driven' systems and define tasks that can be run on a 'predefined schedule'
+	The same underlying technology as CW Events
+	
+	1. 'Events' - are state changesd generated by services like AWS Config, CW, CloudTrial etc.
+	2. 'Rile' - match events and route them to the correct target.
+	3. 'Targets' can be services like Lambda, SNS or EC2, and they respond to the event bytaking some action.
+================
+Exam Tips
+	1. 'Events' - 'eventBridge receives' events relating to state changes in AWS e.g. an EC2 instance changes state or a CW alarm changes state
+	2. 'Rules and actions' - You can use EB to 'create rules' that take actions based on the events it receives e.g. send an SNS notification
+	3. CW Events - EventBridge and CW Events use the 'same underlying technology'
+================
+Recognizing Common HTTP Error Codes
+	1. Client-side Errors
+	2. server-side errors
+	3. A memory Aid
+	4. Exam tips
+-----------------
+400
+403
+404
+=====================
+SDK Excaptions  - A 'response to an error' that has occurred when processing an SDK or API request.
+	BatchGetItem -returns details of 'one or more iytems' from a DynamoDB table
+	Single Operation - 'Limited' to up to 16MB of data and up to 100 items
+	A Partial Result - Is DynamoDB cannot return all the uitems, it returns a 'partial result' along with an exception.
+--------------------
+Causes of a Partial Result?
+	You requested more than 100 items
+	You requested more than 16MB of data
+	The request 'exceeded' the provisioned throughpup of the table
+--------------------
+Example BatchGetItem Errors
+	1. ValidationException - 'Too many items' requested for the 'BatchGetItem' call. - Requested 'fewer' items.
+	2. UnprocessedKeys - If at least one item is successfully processed, you will receive a message that 'some items' were not successfully processed.
+		- Reduce the request size
+	3. ProvisionedThroughputExceededException - No items were successfully processed, due to exceeding the 'provisioned throughput' of the table.
+		-Add capacity (e.g. add DAX)
+-------------------
+Common Exception 'BatchWriteItem'
+	1. BatchWriteItem - 'Puts or deletes' one or more items in one or more DynamoDB tables.
+	2. Single Operation - Limited to up to 16MB of data and up to 25 put or delete operations.
+	3. Failed Operations - If any puts or deletes fail, DynamoDB returns a list of 'UnprocessedItems'
+------------------
+Example BatchWriteItem Errors
+	1. UnprocessedItems  - Some of the operations failed, You will need to 'retry' the unprocessed items
+	2. ProvisionedThroughputExceededException - None of the put or delete operations were processed, due to exceeding the 'provisioned throughput' of the table.
+	3. Need More Write Capacity? - increase the 'write capacity' units on the table
+-----------------
+Exam Tips 
+	1. UnprocessedKeys - 'Some items' were not successfully processed during a 'BatchGetItem' operation.
+	2. ProvisionedThroughputExceededException - None of the operations were processed, due to 'exceeding thr provisioned throughput' of the table
+	3. UnprocessedItems - 'Some items' were not successfully processed during a 'BatchWriteItem' operation.
+	4. Solutions - Reduce the 'size' of the request. Request 'fewer' items. Use DAX to 'cache' reads. Increase 'provisioned capacity'
+=================
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+	
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+	

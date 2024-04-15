@@ -42,7 +42,72 @@ Web Identity Federation  Exam Tips
 
 	An authentication token (JWT token) is exchanged for temporary AWS credentials, allowing users to assume an IAM role, with permission to access AWS resources.
 
------------------
+=================
+Inline, AWS Managed, and Customer Managed policies
+
+Identity Access Managenent
+	Used to define user access permissions within AWS
+	1. AWS Managed Policies
+	2. Customer Managed Policies
+	3. Inline Policies
+
+------------------
+AWS Managed Policies
+	AN IAM policy created and administred by AWS
+	* AmazonDynamoDBFullAccess
+	* AWSCodeCommitPowerUser
+	* AmazonEC2ReadOnlyAccess
+
+	1. Assign appropriate permissions to your users without havingto qwrite the policy youself.
+	2. Attach to multiple users, groups, or roles in the same AWS Account or across different accounts.
+	3. You cannot change the permissions defined in an AWS managed policy
+-------------------
+Customer Managed Policies
+	1. Create by You - A standalone policy that you create and administer inside your own AWS account. 
+			  You can attach this policy to multiple users, groups, and roles within your own account.
+	2. Copy an Existing Policy - In order to create a customer managed policy, you can copy an existing AWS managed policy 
+			  and customize it to fit the requirements of your organization
+	3. Your Needs - Recommended for use cases where the existing AWS managed policies don't meet the needs of your environment.
+------------------
+Inline Policies
+	1. Relationship - There is a strict 1:1 relationship between the entity and the policy
+	2. Embeded - When you delete the user, group, or role which the inline policy is embeded, the policy will also be deleted
+	3. Single User, Group, or Role
+  In most cases, AWS recommends using managed policies over inline policies
+==================
+STS AssumeRoleWithWebIdentity  (STS - Security Token Service )
+	1. STS API - assume-role-with-identity is an API provided by STS (Security token Service)
+	2. Temporary Credentials - Returns temporary security credentials for users authenticated by a mobile or web application or using a web application
+				or using a web ID provider like Amazon, Facebook, Google, etc
+	3. Web Application - Regular web application can use the assume-role-with-web-identity API. For mobile apps, Cognito is recommended.
+------------------
+Example :
+	User ----authenticate---> Facebook
+	     <---JWT Token------
+
+	     -----api call (assume-role-with-web-identity)---> STS
+	     <---change to AWS Credentials--------------------
+
+	---access to AWS resources---> S3, Db, etc...
+-------------------
+Exam Tips:
+	STS - Part of the Security Token Service.
+	Authentication - Allows users who have authenticated with a web identity provider to access AWS resources
+	API Call - After the user has authenticated, the application makes the assume-role-with-web-identity API call
+	Temporary Credentials - If successful, STS will return temporary credentials enabled access to AWS resources.
+	AssumeRoleUser - Within AssumeRoleUser, the Arn and AssumeRoleId are used to programmatically reference the temporary credentials, not an IAM role or user.
+===================
+What is Cross-Account Access?
+	Delegate access to resources in different AWS accounts that you own 
+
+	1. Manage Resources in other Accounts - Share resources in one account with users in a different account
+	2. IAM Role - Create a role in one account to allow access and grant permissions to users in a different account.
+	3. Switch Roles - Switch roles within the AWS managemrnt console. No passwords is required!
+------------------
+
+
+
+
 
 
 

@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Course-Certified-Solutions-Architect-Associate" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/TMP/Working-with-CloudFormation-Nested-Stacks" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/course-aws-certified-developer-associate" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/course-aws-sysops-administrator-associate" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/hands-on-aws-troubleshooting" vcs="Git" />

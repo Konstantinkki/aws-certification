@@ -1,0 +1,3 @@
+https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/client-server-side.html
+https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/what-is-database-encryption-sdk.html
+https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/how-it-works.html
